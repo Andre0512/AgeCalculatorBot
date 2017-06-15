@@ -30,8 +30,8 @@ def get_year_kb(c, r, year, arg):
             column.append(InlineKeyboardButton(str(year), callback_data=arg + ' ' + str(year)))
             year = 1 + year
         row.append(column)
-    row.append([InlineKeyboardButton("Previous", callback_data="prev" + ' ' + str(std_year)),
-                InlineKeyboardButton("Next", callback_data="next" + ' ' + str(std_year))])
+    row.append([InlineKeyboardButton("Previous", callback_data=arg[0:1] + "prev" + ' ' + str(std_year)),
+                InlineKeyboardButton("Next", callback_data=arg[0:1] + "next" + ' ' + str(std_year))])
     return InlineKeyboardMarkup(row)
 
 
@@ -57,10 +57,11 @@ def start(bot, update, chat_data):
     update.message.reply_text(get_text(chat_data), reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
 
 
-def navigate_year(update, chat_data, direction, arg):
+def navigate_year(update, chat_data, arg):
     new_year = int(update.callback_query.data.split(" ")[1])
-    new_year = new_year + 12 if direction == "next" else new_year - 12
-    update.callback_query.message.edit_text(get_text(chat_data), reply_markup=get_year_kb(4, 3, new_year, arg),
+    new_year = new_year + 12 if arg == "gnext" or arg == "snext" else new_year - 12
+    update.callback_query.message.edit_text(get_text(chat_data),
+                                            reply_markup=get_year_kb(4, 3, new_year, arg[0:1] + "year"),
                                             parse_mode=ParseMode.MARKDOWN)
 
 
@@ -76,6 +77,19 @@ def get_text(chat_data):
     return result
 
 
+def get_goal_keyboard():
+    keyboard = [[InlineKeyboardButton("Today", callback_data="today")],
+                [InlineKeyboardButton("Insert date", callback_data="insert")]]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_calc_keyboard():
+    keyboard = [[InlineKeyboardButton("Berechne", callback_data="calc")],
+                [InlineKeyboardButton("Korrigiere Startdatum", callback_data="correct_start")],
+                [InlineKeyboardButton("Korrigiere Zieldatum", callback_data="correct_goal")]]
+    return InlineKeyboardMarkup(keyboard)
+
+
 def button(bot, update, chat_data):
     update.callback_query.answer()
     arg_one = update.callback_query.data.split(" ")[0]
@@ -83,28 +97,31 @@ def button(bot, update, chat_data):
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
         month = ('Jan', 'Feb', 'Mrz', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez')
         update.callback_query.message.edit_text(get_text(chat_data),
-                                                reply_markup=get_number_kb(3, 4, arg_one, name_list=month),
+                                                reply_markup=get_number_kb(3, 4, arg_one[0:1] + "month",
+                                                                           name_list=month),
                                                 parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "smonth" or arg_one == "gmonth":
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
-        update.callback_query.message.edit_text(get_text(chat_data), reply_markup=get_year_kb(4, 3, 1980, arg_one))
+        update.callback_query.message.edit_text(get_text(chat_data),
+                                                reply_markup=get_year_kb(4, 3, 1980, arg_one[0:1] + "year"),
+                                                parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "syear" or arg_one == "gyear":
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
-        keyboard = [[InlineKeyboardButton("Today", callback_data="today")],
-                    [InlineKeyboardButton("Insert date", callback_data="insert")]]
-        update.callback_query.message.edit_text(get_text(chat_data), reply_markup=InlineKeyboardMarkup(keyboard),
+        keyboard = get_calc_keyboard() if "syear" in chat_data and "gyear" in chat_data else get_goal_keyboard()
+        update.callback_query.message.edit_text(get_text(chat_data), reply_markup=keyboard,
                                                 parse_mode=ParseMode.MARKDOWN)
-    elif arg_one == "next" or arg_one == "prev":
-        navigate_year(update, chat_data, arg_one, arg_one)
+    elif arg_one == "snext" or arg_one == "sprev" or arg_one == "gnext" or arg_one == "gprev":
+        navigate_year(update, chat_data, arg_one)
     elif arg_one == "today":
         chat_data["gday"] = datetime.datetime.now().strftime("%d")
         chat_data["gmonth"] = datetime.datetime.now().strftime("%m")
         chat_data["gyear"] = datetime.datetime.now().strftime("%Y")
-        keyboard = [[InlineKeyboardButton("Berechne", callback_data="calc")],
-                    [InlineKeyboardButton("Korrigiere Startdatum", callback_data="correct_start")],
-                    [InlineKeyboardButton("Korrigiere Zieldatum", callback_data="correct_goal")]]
         update.callback_query.message.edit_text(get_text(chat_data), parse_mode=ParseMode.MARKDOWN,
-                                                reply_markup=InlineKeyboardMarkup(keyboard))
+                                                reply_markup=get_calc_keyboard())
+    elif arg_one == "insert":
+        keyboard = get_number_kb(8, 4, "gday", limit=31)
+        update.callback_query.message.edit_text(get_text(chat_data), reply_markup=keyboard,
+                                                parse_mode=ParseMode.MARKDOWN)
 
 
 def main():
