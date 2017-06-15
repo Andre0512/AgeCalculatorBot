@@ -90,6 +90,12 @@ def get_calc_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
+def delete_date(chat_data, arg):
+    chat_data.pop(arg + "year", None)
+    chat_data.pop(arg + "month", None)
+    chat_data.pop(arg + "day", None)
+
+
 def button(bot, update, chat_data):
     update.callback_query.answer()
     arg_one = update.callback_query.data.split(" ")[0]
@@ -120,6 +126,11 @@ def button(bot, update, chat_data):
                                                 reply_markup=get_calc_keyboard())
     elif arg_one == "insert":
         keyboard = get_number_kb(8, 4, "gday", limit=31)
+        update.callback_query.message.edit_text(get_text(chat_data), reply_markup=keyboard,
+                                                parse_mode=ParseMode.MARKDOWN)
+    elif arg_one == "correct_start" or arg_one == "correct_goal":
+        keyboard = get_number_kb(8, 4, arg_one.split("correct_")[1][0:1] + "day", limit=31)
+        delete_date(chat_data, arg_one.split("correct_")[1][0:1])
         update.callback_query.message.edit_text(get_text(chat_data), reply_markup=keyboard,
                                                 parse_mode=ParseMode.MARKDOWN)
 
