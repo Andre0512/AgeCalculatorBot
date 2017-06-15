@@ -3,8 +3,8 @@
 
 import os
 import logging
-
-import datetime
+from dateutil.relativedelta import relativedelta
+from _datetime import datetime
 import yaml
 from telegram import ReplyKeyboardMarkup, KeyboardButton, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
@@ -54,6 +54,8 @@ def start(bot, update, chat_data):
     month = ('Jan', 'Feb', 'Mrz', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez')
     # month = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
     # keyboard = get_number_kb(3, 4, "month", name_list=month)
+    delete_date(chat_data, 's')
+    delete_date(chat_data, 'g')
     update.message.reply_text(get_text(chat_data), reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
 
 
@@ -66,11 +68,11 @@ def navigate_year(update, chat_data, arg):
 
 
 def get_text(chat_data):
-    result = "Startdatum: *"
+    result = "Geburtstag: *"
     result = result + str(chat_data["sday"]) + "." if "sday" in chat_data else result + "xx."
     result = result + str(chat_data["smonth"]) + "." if "smonth" in chat_data else result + "xx."
     result = result + str(chat_data["syear"]) + "*" if "syear" in chat_data else result + "xxxx*"
-    result = result + "\nZieldatum: *"
+    result = result + "\nHeutiges Datum: *"
     result = result + str(chat_data["gday"]) + "." if "gday" in chat_data else result + "xx."
     result = result + str(chat_data["gmonth"]) + "." if "gmonth" in chat_data else result + "xx."
     result = result + str(chat_data["gyear"]) + "*" if "gyear" in chat_data else result + "xxxx*"
@@ -96,6 +98,24 @@ def delete_date(chat_data, arg):
     chat_data.pop(arg + "day", None)
 
 
+def time_since(chat_data):
+    d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"], "%d.%m.%Y")
+    d2 = datetime.strptime(chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
+    result = str(relativedelta(d2, d1).years) + " years\n"
+    result = result + str(relativedelta(d2, d1).months) + " month\n"
+    result = result + str(relativedelta(d2, d1).days) + " days\n"
+    return result
+
+
+def time_to(chat_data):
+    d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"], "%d.%m.%Y")
+    d2 = datetime.strptime(chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
+    result = str(relativedelta(d2, d1).years) + " years\n"
+    result = result + str(relativedelta(d2, d1).months) + " month\n"
+    result = result + str(relativedelta(d2, d1).days) + " days\n"
+    return result
+
+
 def button(bot, update, chat_data):
     update.callback_query.answer()
     arg_one = update.callback_query.data.split(" ")[0]
@@ -119,9 +139,9 @@ def button(bot, update, chat_data):
     elif arg_one == "snext" or arg_one == "sprev" or arg_one == "gnext" or arg_one == "gprev":
         navigate_year(update, chat_data, arg_one)
     elif arg_one == "today":
-        chat_data["gday"] = datetime.datetime.now().strftime("%d")
-        chat_data["gmonth"] = datetime.datetime.now().strftime("%m")
-        chat_data["gyear"] = datetime.datetime.now().strftime("%Y")
+        chat_data["gday"] = datetime.now().strftime("%d")
+        chat_data["gmonth"] = datetime.now().strftime("%m")
+        chat_data["gyear"] = datetime.now().strftime("%Y")
         update.callback_query.message.edit_text(get_text(chat_data), parse_mode=ParseMode.MARKDOWN,
                                                 reply_markup=get_calc_keyboard())
     elif arg_one == "insert":
@@ -129,10 +149,17 @@ def button(bot, update, chat_data):
         update.callback_query.message.edit_text(get_text(chat_data), reply_markup=keyboard,
                                                 parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "correct_start" or arg_one == "correct_goal":
-        keyboard = get_number_kb(8, 4, arg_one.split("correct_")[1][0:1] + "day", limit=31)
         delete_date(chat_data, arg_one.split("correct_")[1][0:1])
+        keyboard = get_number_kb(8, 4, arg_one.split("correct_")[1][0:1] + "day", limit=31)
         update.callback_query.message.edit_text(get_text(chat_data), reply_markup=keyboard,
                                                 parse_mode=ParseMode.MARKDOWN)
+    elif arg_one == "calc":
+        try:
+            update.callback_query.message.edit_text(get_text(chat_data), parse_mode=ParseMode.MARKDOWN)
+            update.callback_query.message.reply_text(str(time_since(chat_data)))
+        except ValueError:
+            update.callback_query.message.reply_text("Achtung, ungültiges Datum...")
+
 
 
 def main():
