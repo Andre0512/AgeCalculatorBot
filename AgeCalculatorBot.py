@@ -3,6 +3,8 @@
 
 import os
 import logging
+
+import datetime
 import yaml
 from telegram import ReplyKeyboardMarkup, KeyboardButton, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
@@ -19,13 +21,13 @@ def get_yml(file):
     return result
 
 
-def get_year_kb(c, r, year):
+def get_year_kb(c, r, year, arg):
     row = []
     std_year = year
     for i in range(r):
         column = []
         for j in range(c):
-            column.append(InlineKeyboardButton(str(year), callback_data="year" + ' ' + str(year)))
+            column.append(InlineKeyboardButton(str(year), callback_data=arg + ' ' + str(year)))
             year = 1 + year
         row.append(column)
     row.append([InlineKeyboardButton("Previous", callback_data="prev" + ' ' + str(std_year)),
@@ -47,40 +49,62 @@ def get_number_kb(c, r, callback, limit=99, name_list=()):
     return InlineKeyboardMarkup(row)
 
 
-def start(bot, update):
-    keyboard = get_number_kb(8, 4, "day", limit=31)
+def start(bot, update, chat_data):
+    keyboard = get_number_kb(8, 4, "sday", limit=31)
     month = ('Jan', 'Feb', 'Mrz', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez')
     # month = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
     # keyboard = get_number_kb(3, 4, "month", name_list=month)
-    update.message.reply_text('Startdatum: xx.xx.xxxx', reply_markup=keyboard)
+    update.message.reply_text(get_text(chat_data), reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
 
 
-def navigate_year(update, chat_data, direction):
+def navigate_year(update, chat_data, direction, arg):
     new_year = int(update.callback_query.data.split(" ")[1])
     new_year = new_year + 12 if direction == "next" else new_year - 12
-    reply_text = 'Startdatum: ' + str(chat_data["day"]) + "." + str(chat_data["month"]) + '.xxxx'
-    update.callback_query.message.edit_text(reply_text, reply_markup=get_year_kb(4, 3, new_year))
+    update.callback_query.message.edit_text(get_text(chat_data), reply_markup=get_year_kb(4, 3, new_year, arg),
+                                            parse_mode=ParseMode.MARKDOWN)
+
+
+def get_text(chat_data):
+    result = "Startdatum: *"
+    result = result + str(chat_data["sday"]) + "." if "sday" in chat_data else result + "xx."
+    result = result + str(chat_data["smonth"]) + "." if "smonth" in chat_data else result + "xx."
+    result = result + str(chat_data["syear"]) + "*" if "syear" in chat_data else result + "xxxx*"
+    result = result + "\nZieldatum: *"
+    result = result + str(chat_data["gday"]) + "." if "gday" in chat_data else result + "xx."
+    result = result + str(chat_data["gmonth"]) + "." if "gmonth" in chat_data else result + "xx."
+    result = result + str(chat_data["gyear"]) + "*" if "gyear" in chat_data else result + "xxxx*"
+    return result
 
 
 def button(bot, update, chat_data):
     update.callback_query.answer()
     arg_one = update.callback_query.data.split(" ")[0]
-    if arg_one == "day":
-        chat_data["day"] = update.callback_query.data.split(" ")[1]
+    if arg_one == "sday" or arg_one == "gday":
+        chat_data[arg_one] = update.callback_query.data.split(" ")[1]
         month = ('Jan', 'Feb', 'Mrz', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez')
-        reply_text = 'Startdatum: ' + str(chat_data["day"]) + '.xx.xxxx'
-        update.callback_query.message.edit_text(reply_text, reply_markup=get_number_kb(3, 4, "month", name_list=month))
-    elif arg_one == "month":
-        chat_data["month"] = update.callback_query.data.split(" ")[1]
-        reply_text = 'Startdatum: ' + str(chat_data["day"]) + "." + str(chat_data["month"]) + '.xxxx'
-        update.callback_query.message.edit_text(reply_text, reply_markup=get_year_kb(4, 3, 1980))
-    elif arg_one == "year":
-        chat_data["year"] = update.callback_query.data.split(" ")[1]
-        reply_text = 'Startdatum: ' + str(chat_data["day"]) + "." + str(chat_data["month"]) + '.' + str(
-            chat_data["year"])
-        update.callback_query.message.edit_text(reply_text)
+        update.callback_query.message.edit_text(get_text(chat_data),
+                                                reply_markup=get_number_kb(3, 4, arg_one, name_list=month),
+                                                parse_mode=ParseMode.MARKDOWN)
+    elif arg_one == "smonth" or arg_one == "gmonth":
+        chat_data[arg_one] = update.callback_query.data.split(" ")[1]
+        update.callback_query.message.edit_text(get_text(chat_data), reply_markup=get_year_kb(4, 3, 1980, arg_one))
+    elif arg_one == "syear" or arg_one == "gyear":
+        chat_data[arg_one] = update.callback_query.data.split(" ")[1]
+        keyboard = [[InlineKeyboardButton("Today", callback_data="today")],
+                    [InlineKeyboardButton("Insert date", callback_data="insert")]]
+        update.callback_query.message.edit_text(get_text(chat_data), reply_markup=InlineKeyboardMarkup(keyboard),
+                                                parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "next" or arg_one == "prev":
-        navigate_year(update, chat_data, arg_one)
+        navigate_year(update, chat_data, arg_one, arg_one)
+    elif arg_one == "today":
+        chat_data["gday"] = datetime.datetime.now().strftime("%d")
+        chat_data["gmonth"] = datetime.datetime.now().strftime("%m")
+        chat_data["gyear"] = datetime.datetime.now().strftime("%Y")
+        keyboard = [[InlineKeyboardButton("Berechne", callback_data="calc")],
+                    [InlineKeyboardButton("Korrigiere Startdatum", callback_data="correct_start")],
+                    [InlineKeyboardButton("Korrigiere Zieldatum", callback_data="correct_goal")]]
+        update.callback_query.message.edit_text(get_text(chat_data), parse_mode=ParseMode.MARKDOWN,
+                                                reply_markup=InlineKeyboardMarkup(keyboard))
 
 
 def main():
@@ -88,8 +112,8 @@ def main():
 
     dp = updater.dispatcher
 
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(MessageHandler(Filters.text, start))
+    dp.add_handler(CommandHandler("start", start, pass_chat_data=True))
+    dp.add_handler(MessageHandler(Filters.text, start, pass_chat_data=True))
     dp.add_handler(CallbackQueryHandler(button, pass_chat_data=True))
 
     updater.start_polling()
