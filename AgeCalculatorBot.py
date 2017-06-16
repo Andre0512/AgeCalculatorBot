@@ -6,6 +6,7 @@ import logging
 from dateutil.relativedelta import relativedelta
 from _datetime import datetime
 import yaml
+import time
 from telegram import ReplyKeyboardMarkup, KeyboardButton, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
@@ -30,8 +31,8 @@ def get_year_kb(c, r, year, arg):
             column.append(InlineKeyboardButton(str(year), callback_data=arg + ' ' + str(year)))
             year = 1 + year
         row.append(column)
-    row.append([InlineKeyboardButton("Previous", callback_data=arg[0:1] + "prev" + ' ' + str(std_year)),
-                InlineKeyboardButton("Next", callback_data=arg[0:1] + "next" + ' ' + str(std_year))])
+    row.append([InlineKeyboardButton("Früher", callback_data=arg[0:1] + "prev" + ' ' + str(std_year)),
+                InlineKeyboardButton("Später", callback_data=arg[0:1] + "next" + ' ' + str(std_year))])
     return InlineKeyboardMarkup(row)
 
 
@@ -80,15 +81,21 @@ def get_text(chat_data):
 
 
 def get_goal_keyboard():
-    keyboard = [[InlineKeyboardButton("Today", callback_data="today")],
-                [InlineKeyboardButton("Insert date", callback_data="insert")]]
+    keyboard = [[InlineKeyboardButton("Heute", callback_data="today")],
+                [InlineKeyboardButton("Anderes Datum", callback_data="insert")]]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_result_keyboard():
+    keyboard = [[InlineKeyboardButton("Absolutes Alter", callback_data="total")],
+                [InlineKeyboardButton("Nächste Geburtstage", callback_data="next_birthdays")]]
     return InlineKeyboardMarkup(keyboard)
 
 
 def get_calc_keyboard():
-    keyboard = [[InlineKeyboardButton("Berechne", callback_data="calc")],
-                [InlineKeyboardButton("Korrigiere Startdatum", callback_data="correct_start")],
-                [InlineKeyboardButton("Korrigiere Zieldatum", callback_data="correct_goal")]]
+    keyboard = [[InlineKeyboardButton("Berechnen", callback_data="calc")],
+                [InlineKeyboardButton("Korrigiere Geburtstag", callback_data="correct_start")],
+                [InlineKeyboardButton("Korrigiere heutiges Datum", callback_data="correct_goal")]]
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -101,18 +108,36 @@ def delete_date(chat_data, arg):
 def time_since(chat_data):
     d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"], "%d.%m.%Y")
     d2 = datetime.strptime(chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
-    result = str(relativedelta(d2, d1).years) + " years\n"
-    result = result + str(relativedelta(d2, d1).months) + " month\n"
-    result = result + str(relativedelta(d2, d1).days) + " days\n"
+    result = "*" + str(relativedelta(d2, d1).years) + "* Jahre\n"
+    result = result + "*" + str(relativedelta(d2, d1).months) + "* Monate\n"
+    result = result + "*" + str(relativedelta(d2, d1).days) + "* Tage\n"
     return result
 
 
 def time_to(chat_data):
+    d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
+    d2 = datetime.strptime(chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
+    if d1 < d2:
+        d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + str((int(chat_data["gyear"]) + 1)),
+                               "%d.%m.%Y")
+    result = "*" + str(relativedelta(d1, d2).months) + " *Monate\n"
+    result = result + "*" + str(relativedelta(d1, d2).days) + "* Tage\n"
+    return result
+
+
+def total_time(chat_data):
     d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"], "%d.%m.%Y")
     d2 = datetime.strptime(chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
-    result = str(relativedelta(d2, d1).years) + " years\n"
-    result = result + str(relativedelta(d2, d1).months) + " month\n"
-    result = result + str(relativedelta(d2, d1).days) + " days\n"
+    diff = d2 - d1
+    days = diff.days
+    seconds = diff.seconds
+
+    result = "*" + str(int(days / 365.25)) + "* Jahre\n"
+    result = result + "*" + str(int(days / 30.4375)) + "* Monate\n"
+    result = result + "*" + str(int(days)) + "* Tage\n"
+    result = result + "*" + str(int(days * 24 + seconds / 3600)) + "* Stunden\n"
+    result = result + "*" + str(int(days * 24 * 60 + seconds / 60)) + "* Minuten\n"
+    result = result + "*" + str(int(days * 24 * 3600 + seconds)) + "* Sekunden\n"
     return result
 
 
@@ -155,11 +180,16 @@ def button(bot, update, chat_data):
                                                 parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "calc":
         try:
-            update.callback_query.message.edit_text(get_text(chat_data), parse_mode=ParseMode.MARKDOWN)
-            update.callback_query.message.reply_text(str(time_since(chat_data)))
+            keyboard = get_result_keyboard()
+            text = "Alter:\n" + time_since(chat_data) + "\n\nNächster Geburtstag:\n" + time_to(chat_data)
+            update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
+                                                    reply_markup=keyboard)
         except ValueError:
-            update.callback_query.message.reply_text("Achtung, ungültiges Datum...")
-
+            update.callback_query.message.reply_text("Achtung, ungültiges Datum...\nVersuche es bitte erneut")
+            start(bot, update.callback_query, chat_data)
+    elif arg_one == "total":
+        text = "Alter:\n" + total_time(chat_data)
+        update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN)
 
 
 def main():
