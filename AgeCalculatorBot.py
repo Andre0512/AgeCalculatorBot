@@ -31,8 +31,8 @@ def get_year_kb(c, r, year, arg):
             column.append(InlineKeyboardButton(str(year), callback_data=arg + ' ' + str(year)))
             year = 1 + year
         row.append(column)
-    row.append([InlineKeyboardButton("Früher", callback_data=arg[0:1] + "prev" + ' ' + str(std_year)),
-                InlineKeyboardButton("Später", callback_data=arg[0:1] + "next" + ' ' + str(std_year))])
+    row.append([InlineKeyboardButton("⬅️ Früher", callback_data=arg[0:1] + "prev" + ' ' + str(std_year)),
+                InlineKeyboardButton("Später ➡️", callback_data=arg[0:1] + "next" + ' ' + str(std_year))])
     return InlineKeyboardMarkup(row)
 
 
@@ -57,13 +57,15 @@ def start(bot, update, chat_data):
     # keyboard = get_number_kb(3, 4, "month", name_list=month)
     delete_date(chat_data, 's')
     delete_date(chat_data, 'g')
-    update.message.reply_text(get_text(chat_data), reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
+    update.message.reply_text(get_text(chat_data) + get_action("sday"),
+                              reply_markup=keyboard,
+                              parse_mode=ParseMode.MARKDOWN)
 
 
 def navigate_year(update, chat_data, arg):
     new_year = int(update.callback_query.data.split(" ")[1])
     new_year = new_year + 12 if arg == "gnext" or arg == "snext" else new_year - 12
-    update.callback_query.message.edit_text(get_text(chat_data),
+    update.callback_query.message.edit_text(get_text(chat_data) + get_action(arg[0:1] + "year"),
                                             reply_markup=get_year_kb(4, 3, new_year, arg[0:1] + "year"),
                                             parse_mode=ParseMode.MARKDOWN)
 
@@ -81,24 +83,38 @@ def get_text(chat_data):
 
 
 def get_goal_keyboard():
-    keyboard = [[InlineKeyboardButton("Heute", callback_data="today")],
-                [InlineKeyboardButton("Anderes Datum", callback_data="insert")]]
+    keyboard = [[InlineKeyboardButton("📅 " + "Heute", callback_data="today")],
+                [InlineKeyboardButton("✏️ " + "Anderes Datum ", callback_data="insert")]]
     return InlineKeyboardMarkup(keyboard)
 
 
 def get_result_keyboard(exclude):
-    keyboard = [[InlineKeyboardButton("Alter", callback_data="calc")],
-                [InlineKeyboardButton("Absolutes Alter", callback_data="total")],
-                [InlineKeyboardButton("Nächste Geburtstage", callback_data="next_birthdays")]]
+    keyboard = [[InlineKeyboardButton("⏳ " + "Alter", callback_data="calc")],
+                [InlineKeyboardButton("📊 " + "Absolutes Alter", callback_data="total")],
+                [InlineKeyboardButton("📆 " + "Nächste Geburtstage", callback_data="next_birthdays")]]
     keyboard.pop(exclude)
     return InlineKeyboardMarkup(keyboard)
 
 
 def get_calc_keyboard():
-    keyboard = [[InlineKeyboardButton("Berechnen", callback_data="calc")],
-                [InlineKeyboardButton("Korrigiere Geburtstag", callback_data="correct_start")],
-                [InlineKeyboardButton("Korrigiere heutiges Datum", callback_data="correct_goal")]]
+    keyboard = [[InlineKeyboardButton("🎛 " + "Berechnen", callback_data="calc")],
+                [InlineKeyboardButton("✏️ " + "Korrigiere Geburtstag", callback_data="correct_start")],
+                [InlineKeyboardButton("✏️ " + "Korrigiere heutiges Datum", callback_data="correct_goal")]]
     return InlineKeyboardMarkup(keyboard)
+
+
+def get_action(arg):
+    if arg[1:] == "day":
+        period = "den Tag"
+    elif arg[1:] == "month":
+        period = "den Monat"
+    else:
+        period = "das Jahr"
+    if arg[0:1] == "s":
+        day = "deines Geburtstags"
+    else:
+        day = "des heutigen Tages"
+    return "\n\n💡 " + "Bitte gebe " + period + " " + day + " ein:"
 
 
 def delete_date(chat_data, arg):
@@ -160,13 +176,13 @@ def button(bot, update, chat_data):
     if arg_one == "sday" or arg_one == "gday":
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
         month = ('Jan', 'Feb', 'Mrz', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez')
-        update.callback_query.message.edit_text(get_text(chat_data),
+        update.callback_query.message.edit_text(get_text(chat_data) + get_action(arg_one[0:1] + "month"),
                                                 reply_markup=get_number_kb(3, 4, arg_one[0:1] + "month",
                                                                            name_list=month),
                                                 parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "smonth" or arg_one == "gmonth":
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
-        update.callback_query.message.edit_text(get_text(chat_data),
+        update.callback_query.message.edit_text(get_text(chat_data) + get_action(arg_one[0:1] + "year"),
                                                 reply_markup=get_year_kb(4, 3, 1980, arg_one[0:1] + "year"),
                                                 parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "syear" or arg_one == "gyear":
@@ -184,13 +200,16 @@ def button(bot, update, chat_data):
                                                 reply_markup=get_calc_keyboard())
     elif arg_one == "insert":
         keyboard = get_number_kb(8, 4, "gday", limit=31)
-        update.callback_query.message.edit_text(get_text(chat_data), reply_markup=keyboard,
+        update.callback_query.message.edit_text(get_text(chat_data) + get_action("gday"),
+                                                reply_markup=keyboard,
                                                 parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "correct_start" or arg_one == "correct_goal":
         delete_date(chat_data, arg_one.split("correct_")[1][0:1])
         keyboard = get_number_kb(8, 4, arg_one.split("correct_")[1][0:1] + "day", limit=31)
-        update.callback_query.message.edit_text(get_text(chat_data), reply_markup=keyboard,
-                                                parse_mode=ParseMode.MARKDOWN)
+        update.callback_query.message.edit_text(
+            get_text(chat_data) + get_action(arg_one.split("correct_")[1][0:1] + "day"),
+            reply_markup=keyboard,
+            parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "calc":
         try:
             text = "Alter:\n" + time_since(chat_data) + "\nNächster Geburtstag:\n" + time_to(chat_data)
