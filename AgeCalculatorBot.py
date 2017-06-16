@@ -86,9 +86,11 @@ def get_goal_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_result_keyboard():
-    keyboard = [[InlineKeyboardButton("Absolutes Alter", callback_data="total")],
+def get_result_keyboard(exclude):
+    keyboard = [[InlineKeyboardButton("Alter", callback_data="calc")],
+                [InlineKeyboardButton("Absolutes Alter", callback_data="total")],
                 [InlineKeyboardButton("Nächste Geburtstage", callback_data="next_birthdays")]]
+    keyboard.pop(exclude)
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -141,6 +143,17 @@ def total_time(chat_data):
     return result
 
 
+def weekdays(chat_data):
+    days = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
+    result = "Wochentage:\n"
+    for i in range(10):
+        result = result + chat_data["sday"] + "." + chat_data["smonth"] + "." + str(
+            int(chat_data["gyear"]) + i) + ": *" + days[int(
+            datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + str(int(chat_data["gyear"]) + i),
+                              "%d.%m.%Y").weekday())] + "*\n"
+    return result
+
+
 def button(bot, update, chat_data):
     update.callback_query.answer()
     arg_one = update.callback_query.data.split(" ")[0]
@@ -180,16 +193,20 @@ def button(bot, update, chat_data):
                                                 parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "calc":
         try:
-            keyboard = get_result_keyboard()
-            text = "Alter:\n" + time_since(chat_data) + "\n\nNächster Geburtstag:\n" + time_to(chat_data)
+            text = "Alter:\n" + time_since(chat_data) + "\nNächster Geburtstag:\n" + time_to(chat_data)
             update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
-                                                    reply_markup=keyboard)
+                                                    reply_markup=get_result_keyboard(0))
         except ValueError:
             update.callback_query.message.reply_text("Achtung, ungültiges Datum...\nVersuche es bitte erneut")
             start(bot, update.callback_query, chat_data)
     elif arg_one == "total":
-        text = "Alter:\n" + total_time(chat_data)
-        update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN)
+        text = "Total:\n" + total_time(chat_data)
+        update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
+                                                reply_markup=get_result_keyboard(1))
+    elif arg_one == "next_birthdays":
+        text = weekdays(chat_data)
+        update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
+                                                reply_markup=get_result_keyboard(2))
 
 
 def main():
