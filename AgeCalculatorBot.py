@@ -95,12 +95,18 @@ def start(bot, update, chat_data):
 
 
 def send(bot, update, chat_data):
-    keyboard = get_number_kb(8, 4, "sday", limit=31)
-    delete_date(chat_data, 's')
-    delete_date(chat_data, 'g')
-    update.message.reply_text(get_text(chat_data) + get_action("sday", chat_data),
-                              reply_markup=keyboard,
-                              parse_mode=ParseMode.MARKDOWN)
+    try:
+        keyboard = get_number_kb(8, 4, "sday", limit=31)
+        delete_date(chat_data, 's')
+        delete_date(chat_data, 'g')
+        update.message.reply_text(get_text(chat_data) + get_action("sday", chat_data),
+                                  reply_markup=keyboard,
+                                  parse_mode=ParseMode.MARKDOWN)
+    except KeyError:
+        user = update.callback_query.from_user if update.callback_query else update.message.from_user
+        if not "lang" in chat_data:
+            chat_data["lang"] = get_language(user)
+        send(bot, update, chat_data)
 
 
 def navigate_year(update, chat_data, arg):
@@ -223,14 +229,27 @@ def total_time(chat_data):
 
 
 def weekdays(chat_data):
+    d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
+    d2 = datetime.strptime(chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
+    add = 1 if d1 < d2 else 0
     days = strings[chat_data["lang"]]["days_list"].split(", ")
     result = strings[chat_data["lang"]]["weekdays"] + ":\n"
     for i in range(10):
         result = result + chat_data["sday"] + "." + chat_data["smonth"] + "." + str(
-            int(chat_data["gyear"]) + i) + ": *" + days[int(
-            datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + str(int(chat_data["gyear"]) + i),
-                              "%d.%m.%Y").weekday())] + "*\n"
+            int(chat_data["gyear"]) + i + add) + ": *" + days[int(
+            datetime.strptime(
+                chat_data["sday"] + "." + chat_data["smonth"] + "." + str(int(chat_data["gyear"]) + i + add),
+                "%d.%m.%Y").weekday())] + "*\n"
     return result
+
+
+def try_button(bot, update, chat_data):
+    try:
+        button(bot, update, chat_data)
+    except KeyError:
+        if not "lang" in chat_data:
+            chat_data["lang"] = get_language(update.callback_query.from_user)
+        send(bot, update.callback_query, chat_data)
 
 
 def button(bot, update, chat_data):
@@ -314,7 +333,7 @@ def main():
 
     dp.add_handler(CommandHandler("start", start, pass_chat_data=True))
     dp.add_handler(MessageHandler(Filters.text, send, pass_chat_data=True))
-    dp.add_handler(CallbackQueryHandler(button, pass_chat_data=True))
+    dp.add_handler(CallbackQueryHandler(try_button, pass_chat_data=True))
 
     updater.start_polling()
     updater.idle()
