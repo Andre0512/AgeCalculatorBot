@@ -213,7 +213,9 @@ def time_to(chat_data):
 
 def total_time(chat_data):
     d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"], "%d.%m.%Y")
-    d2 = datetime.strptime(chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
+    d2 = datetime.strptime(
+        chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"] + " " + datetime.now().strftime("%H:%M:%S"),
+        "%d.%m.%Y %H:%M:%S")
     diff = d2 - d1
     days = diff.days
     seconds = diff.seconds
