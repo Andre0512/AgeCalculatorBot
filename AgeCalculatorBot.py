@@ -312,7 +312,7 @@ def button(bot, update, chat_data):
         log_user(update.callback_query.from_user, chat_data)
         try:
             text = strings[chat_data["lang"]]["age"] + ":\n" + time_since(chat_data) + "\n" + \
-                   strings[chat_data["lang"]]["next"] + ":\n" + time_to(chat_data)
+                   strings[chat_data["lang"]]["upcoming"] + ":\n" + time_to(chat_data)
             update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
                                                     reply_markup=get_result_keyboard(0, chat_data))
         except ValueError:
@@ -332,7 +332,7 @@ def button(bot, update, chat_data):
         send(bot, update.callback_query, chat_data)
     elif arg_one == "new":
         text = strings[chat_data["lang"]]["age"] + ":\n" + time_since(chat_data) + "\n" + \
-               strings[chat_data["lang"]]["next"] + ":\n" + time_to(chat_data)
+               strings[chat_data["lang"]]["upcoming"] + ":\n" + time_to(chat_data)
         update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN)
         send(bot, update.callback_query, chat_data)
     elif arg_one in strings:

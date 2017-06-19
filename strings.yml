@@ -1,0 +1,81 @@
+de:
+  day: Tag
+  month: Monat
+  year: Jahr
+  t_day: den Tag
+  t_month: den Monat
+  t_year: das Jahr
+  days: Tage
+  months: Monate
+  years: Jahre
+  hours: Stunden
+  minutes: Minuten
+  seconds: Sekunden
+  early: Früher
+  late: Später
+  birthday: Geburtstag
+  t_birthday: deines Geburtstags ein
+  todays_date: Heutiges Datum
+  t_todays_date: des heutigen Datums ein
+  today: Heute
+  other_date: Anderes Datum
+  age: Alter
+  total: Absolut
+  upcoming: Nächster Geburtstag
+  calc: Berechnen
+  correct_bday: Korrigiere Geburtstag
+  correct_today: Korrigiere heutiges Datum
+  action_start: Bitte gebe
+  action_end: ein
+  next: Nächste
+  error: Achtung, ungültiges Datum...\nVersuche es bitte erneut
+  month_list: Jan, Feb, Mrz, Apr, Mai, Jun, Jul, Aug, Sep, Okt, Nov, Dez
+  days_list: Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag, Sonntag
+  weekdays: Wochentage
+  greeting: Hallo
+  question: Deine Sprache ist Deutsch, richtig?
+  other_lang: Englisch
+  ja: Richitg
+  nein: Nein
+  ok: Okay, deine Sprache ist Deutsch! Berechne jetzt dein Alter
+  new: Neu
+en:
+  day: Day
+  month: Month
+  year: Year
+  t_day: the day
+  t_month: the month
+  t_year: the year
+  days: days
+  months: months
+  years: years
+  hours: hours
+  minutes: minutes
+  seconds: secondes
+  early: Earlier
+  late: Later
+  birthday: Birthday
+  t_birthday: of your birthday
+  todays_date: Today's date
+  t_todays_date: of today's date
+  today: Today
+  other_date: Other date
+  age: Age
+  total: Total
+  upcoming: Next birthday
+  calc: Calculate
+  correct_bday: Correct birthday
+  correct_today: Correct today's date
+  action_start: Please enter
+  next: Next
+  error: Error, invalid date ...\nPlease try again
+  month_list: Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
+  days_list: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
+  weekdays: Weekdays
+  greeting: Hello
+  question: Your language is English, right?
+  other_lang: German
+  ja: Right
+  nein: Nope
+  ok: Okay, your language is English! Now calculate your age
+  new: New
