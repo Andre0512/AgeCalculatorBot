@@ -75,8 +75,7 @@ def get_number_kb(c, r, callback, limit=99, name_list=()):
 
 def get_language(user):
     try:
-        language = user.language_code
-        language = language.split('-')[0]
+        language = user.language_code[:2]
     except:
         language = 'en'
     return language
