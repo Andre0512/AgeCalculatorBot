@@ -154,11 +154,14 @@ def get_lang_keyboard(chat_data):
         return InlineKeyboardMarkup(keyboard)
 
 
-def get_result_keyboard(exclude, chat_data):
-    keyboard = [[InlineKeyboardButton("⏳ " + strings[chat_data["lang"]]["age"], callback_data="calc")],
-                [InlineKeyboardButton("📊 " + strings[chat_data["lang"]]["total"], callback_data="total")],
-                [InlineKeyboardButton("📆 " + strings[chat_data["lang"]]["next"], callback_data="next_birthdays")]]
-    keyboard.pop(exclude)
+def get_result_keyboard(selected, chat_data):
+    current = [" ", " ", " "]
+    current[selected] = " ☑️"
+    keyboard = [[InlineKeyboardButton("⏳ " + strings[chat_data["lang"]]["age"] + current[0], callback_data="calc"),
+                 InlineKeyboardButton("📊 " + strings[chat_data["lang"]]["total"] + current[1], callback_data="total")],
+                [InlineKeyboardButton("📆 " + strings[chat_data["lang"]]["next"] + current[2],
+                                      callback_data="next_birthdays"),
+                 InlineKeyboardButton("➕ " + strings[chat_data["lang"]]["new"], callback_data="new")]]
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -214,7 +217,8 @@ def time_to(chat_data):
 def total_time(chat_data):
     d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"], "%d.%m.%Y")
     d2 = datetime.strptime(
-        chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"] + " " + datetime.now().strftime("%H:%M:%S"),
+        chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"] + " " + datetime.now().strftime(
+            "%H:%M:%S"),
         "%d.%m.%Y %H:%M:%S")
     diff = d2 - d1
     days = diff.days
@@ -326,6 +330,11 @@ def button(bot, update, chat_data):
         chat_data["confirmed"] = "yes"
         start(bot, update, chat_data)
         send(bot, update.callback_query, chat_data)
+    elif arg_one == "new":
+        text = strings[chat_data["lang"]]["age"] + ":\n" + time_since(chat_data) + "\n" + \
+               strings[chat_data["lang"]]["next"] + ":\n" + time_to(chat_data)
+        update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN)
+        send(bot, update.callback_query, chat_data)
     elif arg_one in strings:
         chat_data["confirmed"] = "yes"
         chat_data["lang"] = arg_one
@@ -355,12 +364,12 @@ def err():
     bot = Bot(get_yml('./config.yml')['agecalculator']['bottoken'])
     try:
         bot.sendMessage(chat_id=get_yml('./config.yml')['agecalculator']['errorid'],
-                text='Crawler fehlgeschalgen: ```' + traceback.format_exc() + '```',
-                disable_notification=True, parse_mode=ParseMode.MARKDOWN)
+                        text='Crawler fehlgeschalgen: ```' + traceback.format_exc() + '```',
+                        disable_notification=True, parse_mode=ParseMode.MARKDOWN)
     except:
         bot.sendMessage(chat_id=get_yml('./config.yml')['agecalculator']['errorid'],
-                text='Crawler fehlgeschalgen: \n' + traceback.format_exc(),
-                disable_notification=True)
+                        text='Crawler fehlgeschalgen: \n' + traceback.format_exc(),
+                        disable_notification=True)
 
 
 if __name__ == '__main__':
@@ -369,4 +378,3 @@ if __name__ == '__main__':
         err()
     except:
         err()
-
