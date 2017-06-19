@@ -4,9 +4,10 @@
 import os
 import logging
 import yaml
+import traceback
 from dateutil.relativedelta import relativedelta
 from _datetime import datetime
-from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
 
@@ -340,5 +341,22 @@ def main():
     updater.idle()
 
 
+def err():
+    bot = Bot(get_yml('./config.yml')['agecalculator']['bottoken'])
+    try:
+        bot.sendMessage(chat_id=get_yml('./config.yml')['agecalculator']['errorid'],
+                text='Crawler fehlgeschalgen: ```' + traceback.format_exc() + '```',
+                disable_notification=True, parse_mode=ParseMode.MARKDOWN)
+    except:
+        bot.sendMessage(chat_id=get_yml('./config.yml')['agecalculator']['errorid'],
+                text='Crawler fehlgeschalgen: \n' + traceback.format_exc(),
+                disable_notification=True)
+
+
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+        err()
+    except:
+        err()
+
