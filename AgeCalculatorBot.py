@@ -257,8 +257,8 @@ def try_button(bot, update, chat_data):
 def log_user(user, chat_data):
     name = user.first_name + " " + user.last_name if user.last_name else user.first_name
     log = ("\n" + name + " " + str(user.id) + " " + user.language_code +
-           " (" + str(chat_data['gday']) + "." + str(chat_data['gmonth']) + "." + str(chat_data['gyear']) + ")")
-    file = open("log.txt", "a")
+           " (" + str(chat_data['sday']) + "." + str(chat_data['smonth']) + "." + str(chat_data['syear']) + ")")
+    file = open("age_log.txt", "a")
     file.write(log)
     file.close()
 
@@ -305,7 +305,7 @@ def button(bot, update, chat_data):
             reply_markup=keyboard,
             parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "calc":
-        log_user(update.callback_query.message.from_user, chat_data)
+        log_user(update.callback_query.from_user, chat_data)
         try:
             text = strings[chat_data["lang"]]["age"] + ":\n" + time_since(chat_data) + "\n" + \
                    strings[chat_data["lang"]]["next"] + ":\n" + time_to(chat_data)
