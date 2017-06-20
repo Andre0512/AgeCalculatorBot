@@ -373,8 +373,9 @@ def err():
 
 
 if __name__ == '__main__':
-    try:
-        main()
-        err()
-    except:
-        err()
+    while True:
+        try:
+            main()
+            err()
+        except:
+            err()
