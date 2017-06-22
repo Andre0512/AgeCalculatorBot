@@ -246,9 +246,10 @@ def weekdays(chat_data):
     add = 1 if d1 < d2 else 0
     days = strings[chat_data["lang"]]["days_list"].split(", ")
     birthday = chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"]
-    birthweekday = days[int(datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"],
-                                     "%d.%m.%Y").weekday())]
-    result = strings[chat_data["lang"]]["weekdays"] + birthday + '*' + birthweekday + "*:\n"
+    birth_weekday = days[int(datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"],
+                                               "%d.%m.%Y").weekday())]
+    result = strings[chat_data["lang"]]["weekdays"] + ':\n' + birthday + ': *' + birth_weekday \
+             + "*\n----------------------------------------\n"
     for i in range(10):
         result = result + chat_data["sday"] + "." + chat_data["smonth"] + "." + str(
             int(chat_data["gyear"]) + i + add) + ": *" + days[int(
