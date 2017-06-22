@@ -237,11 +237,6 @@ def total_time(chat_data):
 def calculate(chat_data):
     result = strings[chat_data["lang"]]["age"] + ":\n" + time_since(chat_data) + "\n" + \
              strings[chat_data["lang"]]["upcoming"] + ":\n" + time_to(chat_data)
-    days = strings[chat_data["lang"]]["days_list"].split(", ")
-    day = days[int(datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + str(int(chat_data["syear"])),
-                                     "%d.%m.%Y").weekday())]
-    text = strings[chat_data["lang"]]["born_day"]
-    result = text.replace('@day', '*' + day + '*') + '\n\n' + result
     return result
 
 
@@ -250,7 +245,10 @@ def weekdays(chat_data):
     d2 = datetime.strptime(chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
     add = 1 if d1 < d2 else 0
     days = strings[chat_data["lang"]]["days_list"].split(", ")
-    result = strings[chat_data["lang"]]["weekdays"] + ":\n"
+    birthday = chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"]
+    birthweekday = days[int(datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"],
+                                     "%d.%m.%Y").weekday())]
+    result = strings[chat_data["lang"]]["weekdays"] + birthday + '*' + birthweekday + "*:\n"
     for i in range(10):
         result = result + chat_data["sday"] + "." + chat_data["smonth"] + "." + str(
             int(chat_data["gyear"]) + i + add) + ": *" + days[int(

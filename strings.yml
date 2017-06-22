@@ -39,7 +39,6 @@ de:
   nein: Nein
   ok: Okay, deine Sprache ist Deutsch! Berechne jetzt dein Alter
   new: Neu
-  born_day: Du wurdest an einem @day geboren.
 en:
   day: Day
   month: Month
@@ -80,4 +79,3 @@ en:
   nein: Nope
   ok: Okay, your language is English! Now calculate your age
   new: New
-  born_day: You were born on a @day.
