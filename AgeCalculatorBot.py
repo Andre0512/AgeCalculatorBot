@@ -234,6 +234,17 @@ def total_time(chat_data):
     return result
 
 
+def calculate(chat_data):
+    result = strings[chat_data["lang"]]["age"] + ":\n" + time_since(chat_data) + "\n" + \
+             strings[chat_data["lang"]]["upcoming"] + ":\n" + time_to(chat_data)
+    days = strings[chat_data["lang"]]["days_list"].split(", ")
+    day = days[int(datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + str(int(chat_data["syear"])),
+                                     "%d.%m.%Y").weekday())]
+    text = strings[chat_data["lang"]]["born_day"]
+    result = text.replace('@day', '*' + day + '*') + '\n\n' + result
+    return result
+
+
 def weekdays(chat_data):
     d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
     d2 = datetime.strptime(chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
@@ -311,9 +322,8 @@ def button(bot, update, chat_data):
     elif arg_one == "calc":
         log_user(update.callback_query.from_user, chat_data)
         try:
-            text = strings[chat_data["lang"]]["age"] + ":\n" + time_since(chat_data) + "\n" + \
-                   strings[chat_data["lang"]]["upcoming"] + ":\n" + time_to(chat_data)
-            update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
+            update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + calculate(chat_data),
+                                                    parse_mode=ParseMode.MARKDOWN,
                                                     reply_markup=get_result_keyboard(0, chat_data))
         except ValueError:
             update.callback_query.message.reply_text(strings[chat_data["lang"]]["error"])
@@ -331,9 +341,8 @@ def button(bot, update, chat_data):
         start(bot, update, chat_data)
         send(bot, update.callback_query, chat_data)
     elif arg_one == "new":
-        text = strings[chat_data["lang"]]["age"] + ":\n" + time_since(chat_data) + "\n" + \
-               strings[chat_data["lang"]]["upcoming"] + ":\n" + time_to(chat_data)
-        update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN)
+        update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + calculate(chat_data),
+                                                parse_mode=ParseMode.MARKDOWN)
         send(bot, update.callback_query, chat_data)
     elif arg_one in strings:
         chat_data["confirmed"] = "yes"
