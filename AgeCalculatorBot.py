@@ -160,8 +160,12 @@ def get_result_keyboard(selected, chat_data):
     keyboard = [[InlineKeyboardButton("⏳ " + strings[chat_data["lang"]]["age"] + current[0], callback_data="calc"),
                  InlineKeyboardButton("📊 " + strings[chat_data["lang"]]["total"] + current[1], callback_data="total")],
                 [InlineKeyboardButton("📆 " + strings[chat_data["lang"]]["next"] + current[2],
-                                      callback_data="next_birthdays"),
-                 InlineKeyboardButton("➕ " + strings[chat_data["lang"]]["new"], callback_data="new")]]
+                                      callback_data="next_birthdays")],
+                [InlineKeyboardButton("➕ " + strings[chat_data["lang"]]["new"], callback_data="new"),
+                 InlineKeyboardButton("👨‍🏫 " + strings[chat_data["lang"]]["contribute"],
+                                      url='https://github.com/Andre0512/AgeCalculatorBot/'),
+                 InlineKeyboardButton("🌟 " + strings[chat_data["lang"]]["rate"],
+                                      url='https://telegram.me/storebot?start=AgeCalculatorBot')]]
     return InlineKeyboardMarkup(keyboard)
 
 

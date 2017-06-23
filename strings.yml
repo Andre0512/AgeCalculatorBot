@@ -39,6 +39,8 @@ de:
   nein: Nein
   ok: Okay, deine Sprache ist Deutsch! Berechne jetzt dein Alter
   new: Neu
+  rate: Bewerten
+  contribute: Beitragen
 en:
   day: Day
   month: Month
@@ -79,3 +81,5 @@ en:
   nein: Nope
   ok: Okay, your language is English! Now calculate your age
   new: New
+  rate: Rate
+  contribute: Contribute
