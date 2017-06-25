@@ -41,6 +41,8 @@ de:
   new: Neu
   rate: Bewerten
   contribute: Beitragen
+  add_time: Geburtszeit hinzufügen
+  action: Bitte korrigiere deine Eingaben oder berechne jetzt.
 en:
   day: Day
   month: Month
@@ -83,3 +85,5 @@ en:
   new: New
   rate: Rate
   contribute: Contribute
+  add_time: Add birth time
+  action: Please correct your inputs or calculate now

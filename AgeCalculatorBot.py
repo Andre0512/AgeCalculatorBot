@@ -129,12 +129,6 @@ def get_text(chat_data):
     return result
 
 
-def get_goal_keyboard(chat_data):
-    keyboard = [[InlineKeyboardButton("📅 " + strings[chat_data["lang"]]["today"], callback_data="today")],
-                [InlineKeyboardButton("✏️ " + strings[chat_data["lang"]]["other_date"], callback_data="insert")]]
-    return InlineKeyboardMarkup(keyboard)
-
-
 def get_lang_keyboard(chat_data):
     if "confirmed" in chat_data:
         chat_data.pop("confirmed", None)
@@ -174,7 +168,9 @@ def get_calc_keyboard(chat_data):
                 [InlineKeyboardButton("✏️ " + strings[chat_data["lang"]]["correct_bday"],
                                       callback_data="correct_start")],
                 [InlineKeyboardButton("✏️ " + strings[chat_data["lang"]]["correct_today"],
-                                      callback_data="correct_goal")]]
+                                      callback_data="correct_goal")],
+                [InlineKeyboardButton("➕ " + strings[chat_data["lang"]]["add_time"],
+                                      callback_data="add_time")]]
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -189,7 +185,7 @@ def get_action(arg, chat_data):
         day = strings[chat_data["lang"]]["t_birthday"]
     else:
         day = strings[chat_data["lang"]]["t_todays_date"]
-    return "\n\n💡 " + strings[chat_data["lang"]]["action_start"] + " " + period + " " + day + " " + ":"
+    return "\n\n💡 " + strings[chat_data["lang"]]["action_start"] + " " + period + " " + day + ":"
 
 
 def delete_date(chat_data, arg):
@@ -298,10 +294,13 @@ def button(bot, update, chat_data):
                                                 parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "syear" or arg_one == "gyear":
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
-        keyboard = get_calc_keyboard(chat_data) if "syear" in chat_data and "gyear" in chat_data else get_goal_keyboard(
-            chat_data)
-        update.callback_query.message.edit_text(get_text(chat_data), reply_markup=keyboard,
-                                                parse_mode=ParseMode.MARKDOWN)
+        if not "gday" in chat_data and not "gmonth" in chat_data and not "gyear" in chat_data:
+            chat_data["gday"] = datetime.now().strftime("%d")
+            chat_data["gmonth"] = datetime.now().strftime("%m")
+            chat_data["gyear"] = datetime.now().strftime("%Y")
+        update.callback_query.message.edit_text(
+            get_text(chat_data) + "\n\n💡 " + strings[chat_data["lang"]]["action"] + ":",
+            reply_markup=get_calc_keyboard(chat_data), parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "snext" or arg_one == "sprev" or arg_one == "gnext" or arg_one == "gprev":
         navigate_year(update, chat_data, arg_one)
     elif arg_one == "today":
