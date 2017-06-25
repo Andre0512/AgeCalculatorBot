@@ -117,11 +117,15 @@ def navigate_year(update, chat_data, arg):
                                             parse_mode=ParseMode.MARKDOWN)
 
 
-def get_text(chat_data):
+def get_text(chat_data, time=False):
     result = strings[chat_data["lang"]]["birthday"] + ": *"
     result = result + str(chat_data["sday"]) + "." if "sday" in chat_data else result + "xx."
     result = result + str(chat_data["smonth"]) + "." if "smonth" in chat_data else result + "xx."
     result = result + str(chat_data["syear"]) + "*" if "syear" in chat_data else result + "xxxx*"
+    if time or "bhour" in chat_data or "bmin" in chat_data:
+        result = result + " *xx:xx*" if not "bhour" in chat_data else result
+        result = result + " *" + str(chat_data["bhour"]) + ":xx*" if "bhour" in chat_data else result
+        result = result[:-4] + ":" + str(chat_data["bmin"]) + "*" if "bmin" in chat_data else result
     result = result + "\n" + strings[chat_data["lang"]]["todays_date"] + ": *"
     result = result + str(chat_data["gday"]) + "." if "gday" in chat_data else result + "xx."
     result = result + str(chat_data["gmonth"]) + "." if "gmonth" in chat_data else result + "xx."
@@ -164,13 +168,14 @@ def get_result_keyboard(selected, chat_data):
 
 
 def get_calc_keyboard(chat_data):
+    birth_time = "➕ " + strings[chat_data["lang"]]["add_time"] if not "bhour" in chat_data else "✏️ " + strings[
+        chat_data["lang"]]["correct_time"]
     keyboard = [[InlineKeyboardButton("🎛 " + strings[chat_data["lang"]]["calc"], callback_data="calc")],
                 [InlineKeyboardButton("✏️ " + strings[chat_data["lang"]]["correct_bday"],
                                       callback_data="correct_start")],
                 [InlineKeyboardButton("✏️ " + strings[chat_data["lang"]]["correct_today"],
                                       callback_data="correct_goal")],
-                [InlineKeyboardButton("➕ " + strings[chat_data["lang"]]["add_time"],
-                                      callback_data="add_time")]]
+                [InlineKeyboardButton(birth_time, callback_data="add_time")]]
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -292,7 +297,7 @@ def button(bot, update, chat_data):
         update.callback_query.message.edit_text(get_text(chat_data) + get_action(arg_one[0:1] + "year", chat_data),
                                                 reply_markup=get_year_kb(4, 3, 1980, arg_one[0:1] + "year", chat_data),
                                                 parse_mode=ParseMode.MARKDOWN)
-    elif arg_one == "syear" or arg_one == "gyear":
+    elif arg_one == "syear" or arg_one == "gyear" or arg_one == "bmin":
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
         if not "gday" in chat_data and not "gmonth" in chat_data and not "gyear" in chat_data:
             chat_data["gday"] = datetime.now().strftime("%d")
@@ -303,17 +308,6 @@ def button(bot, update, chat_data):
             reply_markup=get_calc_keyboard(chat_data), parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "snext" or arg_one == "sprev" or arg_one == "gnext" or arg_one == "gprev":
         navigate_year(update, chat_data, arg_one)
-    elif arg_one == "today":
-        chat_data["gday"] = datetime.now().strftime("%d")
-        chat_data["gmonth"] = datetime.now().strftime("%m")
-        chat_data["gyear"] = datetime.now().strftime("%Y")
-        update.callback_query.message.edit_text(get_text(chat_data), parse_mode=ParseMode.MARKDOWN,
-                                                reply_markup=get_calc_keyboard(chat_data))
-    elif arg_one == "insert":
-        keyboard = get_number_kb(8, 4, "gday", limit=31)
-        update.callback_query.message.edit_text(get_text(chat_data) + get_action("gday", chat_data),
-                                                reply_markup=keyboard,
-                                                parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "correct_start" or arg_one == "correct_goal":
         delete_date(chat_data, arg_one.split("correct_")[1][0:1])
         keyboard = get_number_kb(8, 4, arg_one.split("correct_")[1][0:1] + "day", limit=31)
@@ -346,6 +340,15 @@ def button(bot, update, chat_data):
         update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + calculate(chat_data),
                                                 parse_mode=ParseMode.MARKDOWN)
         send(bot, update.callback_query, chat_data)
+    elif arg_one == "add_time":
+        update.callback_query.message.edit_text(get_text(chat_data, time=True),
+                                                reply_markup=get_number_kb(6, 4, 'bhour', limit=24),
+                                                parse_mode=ParseMode.MARKDOWN)
+    elif arg_one == "bhour":
+        chat_data[arg_one] = update.callback_query.data.split(" ")[1]
+        update.callback_query.message.edit_text(get_text(chat_data),
+                                                reply_markup=get_number_kb(8, 8, 'bmin', limit=60),
+                                                parse_mode=ParseMode.MARKDOWN)
     elif arg_one in strings:
         chat_data["confirmed"] = "yes"
         chat_data["lang"] = arg_one
