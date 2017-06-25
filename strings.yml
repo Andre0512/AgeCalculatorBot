@@ -28,7 +28,8 @@ de:
   action_start: Bitte gebe
   action_end: ein
   next: Nächste
-  error: Achtung, ungültiges Datum...\nVersuche es bitte erneut
+  error: Achtung, ungültiges Datum
+  try_again: Korrigiere deine Eingaben
   month_list: Jan, Feb, Mrz, Apr, Mai, Jun, Jul, Aug, Sep, Okt, Nov, Dez
   days_list: Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag, Sonntag
   weekdays: Wochentage
@@ -73,7 +74,8 @@ en:
   correct_today: Correct today's date
   action_start: Please enter
   next: Next
-  error: Error, invalid date ...\nPlease try again
+  error: Error, invalid date
+  try_again: Please correct your data
   month_list: Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
   days_list: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
   weekdays: Weekdays

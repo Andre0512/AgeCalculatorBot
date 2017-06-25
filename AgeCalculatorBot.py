@@ -60,12 +60,12 @@ def get_year_kb(c, r, year, arg, chat_data):
     return InlineKeyboardMarkup(row)
 
 
-def get_number_kb(c, r, callback, limit=99, name_list=()):
+def get_number_kb(c, r, callback, limit=99, name_list=(), start_one=True):
     row = []
     for i in range(r):
         column = []
         for j in range(c):
-            pos = str(i * c + (j + 1))
+            pos = str(i * c + (j + int(start_one)))
             full_name = "0" + pos if int(pos) < 10 else pos
             name = full_name if not name_list else name_list[int(pos) - 1]
             if int(pos) < limit + 1:
@@ -99,6 +99,8 @@ def send(bot, update, chat_data):
         keyboard = get_number_kb(8, 4, "sday", limit=31)
         delete_date(chat_data, 's')
         delete_date(chat_data, 'g')
+        chat_data.pop("bhour", None)
+        chat_data.pop("bmin", None)
         update.message.reply_text(get_text(chat_data) + get_action("sday", chat_data),
                                   reply_markup=keyboard,
                                   parse_mode=ParseMode.MARKDOWN)
@@ -322,8 +324,10 @@ def button(bot, update, chat_data):
                                                     parse_mode=ParseMode.MARKDOWN,
                                                     reply_markup=get_result_keyboard(0, chat_data))
         except ValueError:
-            update.callback_query.message.reply_text(strings[chat_data["lang"]]["error"])
-            start(bot, update.callback_query, chat_data)
+            update.callback_query.message.edit_text(
+                get_text(chat_data) + "\n\n‼️ " + strings[chat_data["lang"]]["error"] + " ‼️" + "\n💡 " +
+                strings[chat_data["lang"]]["try_again"] + ":",
+                reply_markup=get_calc_keyboard(chat_data), parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "total":
         text = strings[chat_data["lang"]]["total"] + ":\n" + total_time(chat_data)
         update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
@@ -342,12 +346,12 @@ def button(bot, update, chat_data):
         send(bot, update.callback_query, chat_data)
     elif arg_one == "add_time":
         update.callback_query.message.edit_text(get_text(chat_data, time=True),
-                                                reply_markup=get_number_kb(6, 4, 'bhour', limit=24),
+                                                reply_markup=get_number_kb(6, 4, 'bhour', limit=24, start_one=False),
                                                 parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "bhour":
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
         update.callback_query.message.edit_text(get_text(chat_data),
-                                                reply_markup=get_number_kb(8, 8, 'bmin', limit=60),
+                                                reply_markup=get_number_kb(8, 8, 'bmin', limit=60, start_one=False),
                                                 parse_mode=ParseMode.MARKDOWN)
     elif arg_one in strings:
         chat_data["confirmed"] = "yes"
