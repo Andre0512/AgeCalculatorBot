@@ -5,8 +5,9 @@ import os
 import logging
 import yaml
 import traceback
+import math
 from dateutil.relativedelta import relativedelta
-from _datetime import datetime
+from _datetime import datetime, timedelta
 from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
@@ -155,17 +156,19 @@ def get_lang_keyboard(chat_data):
 
 
 def get_result_keyboard(selected, chat_data):
-    current = [" ", " ", " "]
+    current = [" ", " ", " ", " "]
     current[selected] = " ☑️"
     keyboard = [[InlineKeyboardButton("⏳ " + strings[chat_data["lang"]]["age"] + current[0], callback_data="calc"),
                  InlineKeyboardButton("📊 " + strings[chat_data["lang"]]["total"] + current[1], callback_data="total")],
                 [InlineKeyboardButton("📆 " + strings[chat_data["lang"]]["next"] + current[2],
-                                      callback_data="next_birthdays")],
+                                      callback_data="next_birthdays"),
+                 InlineKeyboardButton("🎊 " + strings[chat_data["lang"]]["events"] + current[3],
+                                      callback_data="special_events")],
                 [InlineKeyboardButton("👨‍🏫 " + strings[chat_data["lang"]]["contribute"],
                                       url='https://github.com/Andre0512/AgeCalculatorBot/'),
                  InlineKeyboardButton("🌟 " + strings[chat_data["lang"]]["rate"],
                                       url='https://telegram.me/storebot?start=AgeCalculatorBot'),
-                InlineKeyboardButton("➕ " + strings[chat_data["lang"]]["new"], callback_data="new")]]
+                 InlineKeyboardButton("➕ " + strings[chat_data["lang"]]["new"], callback_data="new")]]
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -221,14 +224,19 @@ def time_to(chat_data):
     return result
 
 
-def total_time(chat_data):
+def get_dates(chat_data):
     time = chat_data["bhour"] + ":" + chat_data["bmin"] if "bhour" in chat_data else "00:00"
-    d1 = datetime.strptime(
+    bday = datetime.strptime(
         chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"] + " " + time, "%d.%m.%Y %H:%M")
-    d2 = datetime.strptime(
+    tday = datetime.strptime(
         chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"] + " " + datetime.now().strftime(
             "%H:%M:%S"), "%d.%m.%Y %H:%M:%S")
-    diff = d2 - d1
+    return bday, tday
+
+
+def total_time(chat_data):
+    bday, tday = get_dates(chat_data)
+    diff = tday - bday
     days = diff.days
     seconds = diff.seconds
 
@@ -241,6 +249,17 @@ def total_time(chat_data):
     result = result + "*" + str(int(days * 24 * 3600 + seconds)) + "* " + strings[chat_data["lang"]]["seconds"] + "\n"
     return result
 
+
+def special_days(chat_data):
+    bday, tday = get_dates(chat_data)
+    d_age = (tday - bday).days
+    s_age = (tday - bday).seconds
+
+    month = strings[chat_data["lang"]]["month_list"].split(", ")
+    next = 50 * int(math.ceil((d_age / 30.4375) / 50))
+    next_d = bday + timedelta(days=next * 30.4375)
+    result = '*' + str(next) + ': *' + str(month[next_d.date().month]) + '. ' + str(next_d.date().year)
+    return result
 
 def calculate(chat_data):
     result = strings[chat_data["lang"]]["age"] + ":\n" + time_since(chat_data) + "\n" + \
@@ -361,6 +380,10 @@ def button(bot, update, chat_data):
             get_text(chat_data) + "\n\n💡 " + strings[chat_data["lang"]]["action_start"] + " " +
             strings[chat_data["lang"]]["b_min"] + ":",
             reply_markup=get_number_kb(8, 8, 'bmin', limit=60, start_one=False), parse_mode=ParseMode.MARKDOWN)
+    elif arg_one == "special_events":
+        text = special_days(chat_data)
+        update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
+                                                reply_markup=get_result_keyboard(3, chat_data))
     elif arg_one in strings:
         chat_data["confirmed"] = "yes"
         chat_data["lang"] = arg_one
