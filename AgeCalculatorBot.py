@@ -250,16 +250,24 @@ def total_time(chat_data):
     return result
 
 
+def special_month(bday, d_age, chat_data, base, add=0):
+    month = strings[chat_data["lang"]]["month_list"].split(", ")
+    oonext = base * int(math.ceil((d_age / 30.4375) / base)) + add
+    oonext_d = bday + timedelta(days=oonext * 30.4375)
+    result = '\n*' + str(oonext) + ': *' + str(month[oonext_d.date().month - 1]) + '. ' + str(oonext_d.date().year)
+    return result
+
+
 def special_days(chat_data):
     bday, tday = get_dates(chat_data)
     d_age = (tday - bday).days
     s_age = (tday - bday).seconds
 
-    month = strings[chat_data["lang"]]["month_list"].split(", ")
-    next = 50 * int(math.ceil((d_age / 30.4375) / 50))
-    next_d = bday + timedelta(days=next * 30.4375)
-    result = '*' + str(next) + ': *' + str(month[next_d.date().month]) + '. ' + str(next_d.date().year)
-    return result
+    result = special_month(bday, d_age, chat_data, 50)
+    result = result + special_month(bday, d_age, chat_data, 50, add=50)
+    result = result + special_month(bday, d_age, chat_data, 1000)
+    return strings[chat_data["lang"]]["months"] + ':' + result
+
 
 def calculate(chat_data):
     result = strings[chat_data["lang"]]["age"] + ":\n" + time_since(chat_data) + "\n" + \
