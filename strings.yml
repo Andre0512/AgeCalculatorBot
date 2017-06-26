@@ -26,7 +26,6 @@ de:
   correct_bday: Korrigiere Geburtstag
   correct_today: Korrigiere heutiges Datum
   action_start: Bitte gebe
-  action_end: ein
   next: Nächste
   error: Achtung, ungültiges Datum
   try_again: Korrigiere deine Eingaben
@@ -41,10 +40,12 @@ de:
   ok: Okay, deine Sprache ist Deutsch! Berechne jetzt dein Alter
   new: Neu
   rate: Bewerten
-  contribute: Beitragen
+  contribute: GitHub
   add_time: Geburtszeit hinzufügen
   correct_time: Geburtszeit korrigieren
   action: Bitte korrigiere deine Eingaben oder berechne jetzt
+  b_hour: die Stunde deiner Geburt ein
+  b_min: die Minute deiner Geburt ein
 en:
   day: Day
   month: Month
@@ -87,7 +88,9 @@ en:
   ok: Okay, your language is English! Now calculate your age
   new: New
   rate: Rate
-  contribute: Contribute
+  contribute: Contrib
   add_time: Add birth time
   correct_time: Correct birth time
   action: Please correct your inputs or calculate now
+  b_hour: the hour of your birth
+  b_min: the minute of your birth

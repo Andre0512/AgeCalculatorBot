@@ -161,11 +161,11 @@ def get_result_keyboard(selected, chat_data):
                  InlineKeyboardButton("📊 " + strings[chat_data["lang"]]["total"] + current[1], callback_data="total")],
                 [InlineKeyboardButton("📆 " + strings[chat_data["lang"]]["next"] + current[2],
                                       callback_data="next_birthdays")],
-                [InlineKeyboardButton("➕ " + strings[chat_data["lang"]]["new"], callback_data="new"),
-                 InlineKeyboardButton("👨‍🏫 " + strings[chat_data["lang"]]["contribute"],
+                [InlineKeyboardButton("👨‍🏫 " + strings[chat_data["lang"]]["contribute"],
                                       url='https://github.com/Andre0512/AgeCalculatorBot/'),
                  InlineKeyboardButton("🌟 " + strings[chat_data["lang"]]["rate"],
-                                      url='https://telegram.me/storebot?start=AgeCalculatorBot')]]
+                                      url='https://telegram.me/storebot?start=AgeCalculatorBot'),
+                InlineKeyboardButton("➕ " + strings[chat_data["lang"]]["new"], callback_data="new")]]
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -267,13 +267,17 @@ def weekdays(chat_data):
     return result
 
 
-def try_button(bot, update, chat_data):
+def _try_button(bot, update, chat_data):
     try:
         button(bot, update, chat_data)
     except KeyError:
         if not "lang" in chat_data:
             chat_data["lang"] = get_language(update.callback_query.from_user)
         send(bot, update.callback_query, chat_data)
+
+
+def try_button(bot, update, chat_data):
+    button(bot, update, chat_data)
 
 
 def log_user(user, chat_data):
@@ -346,14 +350,17 @@ def button(bot, update, chat_data):
                                                 parse_mode=ParseMode.MARKDOWN)
         send(bot, update.callback_query, chat_data)
     elif arg_one == "add_time":
-        update.callback_query.message.edit_text(get_text(chat_data, time=True),
-                                                reply_markup=get_number_kb(6, 4, 'bhour', limit=24, start_one=False),
-                                                parse_mode=ParseMode.MARKDOWN)
+        update.callback_query.message.edit_text(
+            get_text(chat_data, time=True) + "\n\n💡 " + strings[chat_data["lang"]]["action_start"] + " " +
+            strings[chat_data["lang"]]["b_hour"] + ":",
+            reply_markup=get_number_kb(6, 4, 'bhour', limit=24, start_one=False),
+            parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "bhour":
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
-        update.callback_query.message.edit_text(get_text(chat_data),
-                                                reply_markup=get_number_kb(8, 8, 'bmin', limit=60, start_one=False),
-                                                parse_mode=ParseMode.MARKDOWN)
+        update.callback_query.message.edit_text(
+            get_text(chat_data) + "\n\n💡 " + strings[chat_data["lang"]]["action_start"] + " " +
+            strings[chat_data["lang"]]["b_min"] + ":",
+            reply_markup=get_number_kb(8, 8, 'bmin', limit=60, start_one=False), parse_mode=ParseMode.MARKDOWN)
     elif arg_one in strings:
         chat_data["confirmed"] = "yes"
         chat_data["lang"] = arg_one
