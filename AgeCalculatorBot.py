@@ -267,17 +267,50 @@ def special_days(bday, d_age, chat_data, base, add=0):
     return result
 
 
+def special_hours(bday, s_age, chat_data, base, add=0):
+    next = base * int(math.ceil((s_age / 3600) / base)) + add
+    next_d = bday + timedelta(hours=next)
+    result = '\n*' + str(next) + ' ' + strings[chat_data["lang"]]["hours"] + ': *' + datetime.strftime(next_d,
+                                                                                                       "%d.%m.%Y %H:%M")
+    return result
+
+
+def special_minutes(bday, s_age, chat_data, base, add=0):
+    next = base * int(math.ceil((s_age / 60) / base)) + add
+    next_d = bday + timedelta(minutes=next)
+    result = '\n*' + str(next) + ' ' + strings[chat_data["lang"]]["minutes"] + ': *' + datetime.strftime(next_d,
+                                                                                                         "%d.%m.%Y %H:%M")
+    return result
+
+
+def special_seconds(bday, s_age, chat_data, base, add=0):
+    next = base * int(math.ceil(s_age / base)) + add
+    next_d = bday + timedelta(seconds=next)
+    result = '\n*' + str(next) + ' ' + strings[chat_data["lang"]]["seconds"] + ': *' + datetime.strftime(next_d,
+                                                                                                         "%d.%m.%Y %H:%M:%S")
+    return result
+
+
 def special_events(chat_data):
     bday, tday = get_dates(chat_data)
     d_age = (tday - bday).days
-    s_age = (tday - bday).seconds
+    s_age = (tday - bday).total_seconds()
 
     result = special_month(bday, d_age, chat_data, 50)
     result = result + special_month(bday, d_age, chat_data, 50, add=50)
     result = result + special_month(bday, d_age, chat_data, 1000) + '\n'
     result = result + special_days(bday, d_age, chat_data, 1000)
     result = result + special_days(bday, d_age, chat_data, 2500)
-    result = result + special_days(bday, d_age, chat_data, 10000)
+    result = result + special_days(bday, d_age, chat_data, 10000) + '\n'
+    result = result + special_hours(bday, s_age, chat_data, 10000)
+    result = result + special_hours(bday, s_age, chat_data, 50000)
+    result = result + special_hours(bday, s_age, chat_data, 100000) + '\n'
+    result = result + special_minutes(bday, s_age, chat_data, 1000000)
+    result = result + special_minutes(bday, s_age, chat_data, 2500000)
+    result = result + special_minutes(bday, s_age, chat_data, 10000000) + '\n'
+    result = result + special_seconds(bday, s_age, chat_data, 100000000)
+    result = result + special_seconds(bday, s_age, chat_data, 250000000)
+    result = result + special_seconds(bday, s_age, chat_data, 1000000000) + '\n'
     return result
 
 
