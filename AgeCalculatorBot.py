@@ -252,21 +252,33 @@ def total_time(chat_data):
 
 def special_month(bday, d_age, chat_data, base, add=0):
     month = strings[chat_data["lang"]]["month_list"].split(", ")
-    oonext = base * int(math.ceil((d_age / 30.4375) / base)) + add
-    oonext_d = bday + timedelta(days=oonext * 30.4375)
-    result = '\n*' + str(oonext) + ': *' + str(month[oonext_d.date().month - 1]) + '. ' + str(oonext_d.date().year)
+    next = base * int(math.ceil((d_age / 30.4375) / base)) + add
+    next_d = bday + timedelta(days=next * 30.4375)
+    result = '\n*' + str(next) + ' ' + strings[chat_data["lang"]]["months"] + ': *' + str(
+        month[next_d.date().month - 1]) + '. ' + str(next_d.date().year)
     return result
 
 
-def special_days(chat_data):
+def special_days(bday, d_age, chat_data, base, add=0):
+    next = base * int(math.ceil(d_age / base)) + add
+    next_d = bday + timedelta(days=next)
+    result = '\n*' + str(next) + ' ' + strings[chat_data["lang"]]["days"] + ': *' + datetime.strftime(next_d,
+                                                                                                      "%d.%m.%Y")
+    return result
+
+
+def special_events(chat_data):
     bday, tday = get_dates(chat_data)
     d_age = (tday - bday).days
     s_age = (tday - bday).seconds
 
     result = special_month(bday, d_age, chat_data, 50)
     result = result + special_month(bday, d_age, chat_data, 50, add=50)
-    result = result + special_month(bday, d_age, chat_data, 1000)
-    return strings[chat_data["lang"]]["months"] + ':' + result
+    result = result + special_month(bday, d_age, chat_data, 1000) + '\n'
+    result = result + special_days(bday, d_age, chat_data, 1000)
+    result = result + special_days(bday, d_age, chat_data, 2500)
+    result = result + special_days(bday, d_age, chat_data, 10000)
+    return result
 
 
 def calculate(chat_data):
@@ -389,8 +401,8 @@ def button(bot, update, chat_data):
             strings[chat_data["lang"]]["b_min"] + ":",
             reply_markup=get_number_kb(8, 8, 'bmin', limit=60, start_one=False), parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "special_events":
-        text = special_days(chat_data)
-        update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
+        text = special_events(chat_data)
+        update.callback_query.message.edit_text(get_text(chat_data) + "\n" + text, parse_mode=ParseMode.MARKDOWN,
                                                 reply_markup=get_result_keyboard(3, chat_data))
     elif arg_one in strings:
         chat_data["confirmed"] = "yes"
