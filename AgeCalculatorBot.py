@@ -254,40 +254,50 @@ def special_month(bday, d_age, chat_data, base, add=0):
     month = strings[chat_data["lang"]]["month_list"].split(", ")
     next = base * int(math.ceil((d_age / 30.4375) / base)) + add
     next_d = bday + timedelta(days=next * 30.4375)
-    result = '\n*' + str(next) + ' ' + strings[chat_data["lang"]]["months"] + ': *' + str(
+    result = '\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]]["months"] + ': *' + str(
         month[next_d.date().month - 1]) + '. ' + str(next_d.date().year)
+    if strings[chat_data['lang']]['seperator'] == "dot":
+        result = result.replace(',', '.')
     return result
 
 
 def special_days(bday, d_age, chat_data, base, add=0):
     next = base * int(math.ceil(d_age / base)) + add
     next_d = bday + timedelta(days=next)
-    result = '\n*' + str(next) + ' ' + strings[chat_data["lang"]]["days"] + ': *' + datetime.strftime(next_d,
-                                                                                                      "%d.%m.%Y")
+    result = '\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]]["days"] + ': *' + datetime.strftime(
+        next_d, "%d.%m.%Y")
+    if strings[chat_data['lang']]['seperator'] == "dot":
+        result = result.replace(',', '.')
     return result
 
 
 def special_hours(bday, s_age, chat_data, base, add=0):
     next = base * int(math.ceil((s_age / 3600) / base)) + add
     next_d = bday + timedelta(hours=next)
-    result = '\n*' + str(next) + ' ' + strings[chat_data["lang"]]["hours"] + ': *' + datetime.strftime(next_d,
-                                                                                                       "%d.%m.%Y %H:%M")
+    result = '\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]]["hours"] + ': *' + datetime.strftime(
+        next_d, "%d.%m.%Y %H:%M")
+    if strings[chat_data['lang']]['seperator'] == "dot":
+        result = result.replace(',', '.')
     return result
 
 
 def special_minutes(bday, s_age, chat_data, base, add=0):
     next = base * int(math.ceil((s_age / 60) / base)) + add
     next_d = bday + timedelta(minutes=next)
-    result = '\n*' + str(next) + ' ' + strings[chat_data["lang"]]["minutes"] + ': *' + datetime.strftime(next_d,
-                                                                                                         "%d.%m.%Y %H:%M")
+    result = '\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]][
+        "minutes"] + ': *' + datetime.strftime(next_d, "%d.%m.%Y %H:%M")
+    if strings[chat_data['lang']]['seperator'] == "dot":
+        result = result.replace(',', '.')
     return result
 
 
 def special_seconds(bday, s_age, chat_data, base, add=0):
     next = base * int(math.ceil(s_age / base)) + add
     next_d = bday + timedelta(seconds=next)
-    result = '\n*' + str(next) + ' ' + strings[chat_data["lang"]]["seconds"] + ': *' + datetime.strftime(next_d,
-                                                                                                         "%d.%m.%Y %H:%M:%S")
+    result = '\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]][
+        "seconds"] + ': *' + datetime.strftime(next_d, "%d.%m.%Y %H:%M:%S")
+    if strings[chat_data['lang']]['seperator'] == "dot":
+        result = result.replace(',', '.')
     return result
 
 
