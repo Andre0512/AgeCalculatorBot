@@ -15,9 +15,8 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 def custom_str_constructor(loader, node):
     return loader.construct_scalar(node).encode('utf-8')
 
-
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
+                    level=logging.INFO, filename='error.log')
 
 logger = logging.getLogger(__name__)
 
@@ -76,12 +75,10 @@ def get_number_kb(c, r, callback, limit=99, name_list=(), start_one=True):
 
 
 def get_language(user):
-    try:
-        language = user.language_code[:2]
-    except:
-        language = 'en'
-    return language
-
+    if user.language_code:
+        language_code = user.language_code[:2]
+        return language_code if language_code in strings else 'en'
+    return 'en'
 
 def start(bot, update, chat_data):
     user = update.callback_query.from_user if update.callback_query else update.message.from_user
