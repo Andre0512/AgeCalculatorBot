@@ -239,13 +239,15 @@ def total_time(chat_data):
     days = diff.days
     seconds = diff.seconds
 
-    result = "*" + str(int(days / 365.25)) + "* " + strings[chat_data["lang"]]["years"] + "\n"
-    result = result + "*" + str(int(days / 30.4375)) + "* " + strings[chat_data["lang"]]["months"] + "\n"
-    result = result + "*" + str(int(days)) + "* " + strings[chat_data["lang"]]["days"] + "\n"
-    result = result + "*" + str(int(days * 24 + seconds / 3600)) + "* " + strings[chat_data["lang"]]["hours"] + "\n"
-    result = result + "*" + str(int(days * 24 * 60 + seconds / 60)) + "* " + strings[chat_data["lang"]][
+    result = "*" + str('{0:,}'.format(int(days / 365.25))) + "* " + strings[chat_data["lang"]]["years"] + "\n"
+    result = result + "*" + str('{0:,}'.format(int(days / 30.4375))) + "* " + strings[chat_data["lang"]]["months"] + "\n"
+    result = result + "*" + str('{0:,}'.format(int(days))) + "* " + strings[chat_data["lang"]]["days"] + "\n"
+    result = result + "*" + str('{0:,}'.format(int(days * 24 + seconds / 3600))) + "* " + strings[chat_data["lang"]]["hours"] + "\n"
+    result = result + "*" + str('{0:,}'.format(int(days * 24 * 60 + seconds / 60))) + "* " + strings[chat_data["lang"]][
         "minutes"] + "\n"
-    result = result + "*" + str(int(days * 24 * 3600 + seconds)) + "* " + strings[chat_data["lang"]]["seconds"] + "\n"
+    result = result + "*" + str('{0:,}'.format(int(days * 24 * 3600 + seconds))) + "* " + strings[chat_data["lang"]]["seconds"] + "\n"
+    if strings[chat_data['lang']]['seperator'] == "dot":
+        result = result.replace(',', '.')
     return result
 
 
