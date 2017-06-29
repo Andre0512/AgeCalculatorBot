@@ -5,9 +5,7 @@ import os
 import logging
 import yaml
 import traceback
-import math
-from dateutil.relativedelta import relativedelta
-from _datetime import datetime, timedelta
+import Calculate
 from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
@@ -205,199 +203,6 @@ def delete_date(chat_data, arg):
     chat_data.pop(arg + "month", None)
     chat_data.pop(arg + "day", None)
 
-
-def time_since(chat_data):
-    d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"], "%d.%m.%Y")
-    d2 = datetime.strptime(chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
-    result = "*" + str(relativedelta(d2, d1).years) + "* " + strings[chat_data["lang"]]["years"] + "\n"
-    result = result + "*" + str(relativedelta(d2, d1).months) + "* " + strings[chat_data["lang"]]["months"] + "\n"
-    result = result + "*" + str(relativedelta(d2, d1).days) + "* " + strings[chat_data["lang"]]["days"] + "\n"
-    return result
-
-
-def time_to(chat_data):
-    d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
-    d2 = datetime.strptime(chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
-    if d1 < d2:
-        d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + str((int(chat_data["gyear"]) + 1)),
-                               "%d.%m.%Y")
-    result = "*" + str(relativedelta(d1, d2).months) + "* " + strings[chat_data["lang"]]["months"] + "\n"
-    result = result + "*" + str(relativedelta(d1, d2).days) + "* " + strings[chat_data["lang"]]["days"] + "\n"
-    return result
-
-
-def get_dates(chat_data):
-    time = chat_data["bhour"] + ":" + chat_data["bmin"] if "bhour" in chat_data else "00:00"
-    bday = datetime.strptime(
-        chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"] + " " + time, "%d.%m.%Y %H:%M")
-    tday = datetime.strptime(
-        chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"] + " " + datetime.now().strftime(
-            "%H:%M:%S"), "%d.%m.%Y %H:%M:%S")
-    return bday, tday
-
-
-def total_time(chat_data):
-    bday, tday = get_dates(chat_data)
-    diff = tday - bday
-    days = diff.days
-    seconds = diff.seconds
-
-    result = "*" + str('{0:,}'.format(int(days / 365.25))) + "* " + strings[chat_data["lang"]]["years"] + "\n"
-    result = result + "*" + str('{0:,}'.format(int(days / 30.4375))) + "* " + strings[chat_data["lang"]][
-        "months"] + "\n"
-    result = result + "*" + str('{0:,}'.format(int(days))) + "* " + strings[chat_data["lang"]]["days"] + "\n"
-    result = result + "*" + str('{0:,}'.format(int(days * 24 + seconds / 3600))) + "* " + strings[chat_data["lang"]][
-        "hours"] + "\n"
-    result = result + "*" + str('{0:,}'.format(int(days * 24 * 60 + seconds / 60))) + "* " + strings[chat_data["lang"]][
-        "minutes"] + "\n"
-    result = result + "*" + str('{0:,}'.format(int(days * 24 * 3600 + seconds))) + "* " + strings[chat_data["lang"]][
-        "seconds"] + "\n"
-    if strings[chat_data['lang']]['seperator'] == "dot":
-        result = result.replace(',', '.')
-    return result
-
-
-def special_month(bday, d_age, chat_data, add=0, repdigit=False):
-    number = next_big(d_age / 30.4375, add=add) if not repdigit else calculate_repdigit(int(d_age / 30.4375))
-    month = strings[chat_data["lang"]]["month_list"].split(", ")
-    next = number * int(math.ceil((d_age / 30.4375) / number))
-    next_d = bday + timedelta(days=next * 30.4375)
-    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]]["months"] + ':\n*' + str(
-        month[next_d.date().month - 1]) + '. ' + str(next_d.date().year)
-    if strings[chat_data['lang']]['seperator'] == "dot":
-        result = result.replace(',', '.')
-    return result, next_d
-
-
-def special_days(bday, d_age, chat_data, add=0, repdigit=False):
-    number = next_big(d_age, add=add) if not repdigit else calculate_repdigit(int(d_age))
-    next = number * int(math.ceil(d_age / number))
-    next_d = bday + timedelta(days=next)
-    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]][
-        "days"] + ':\n*' + datetime.strftime(
-        next_d, "%d.%m.%Y")
-    if strings[chat_data['lang']]['seperator'] == "dot":
-        result = result.replace(',', '.')
-    return result, next_d
-
-
-def special_hours(bday, s_age, chat_data, add=0, repdigit=False):
-    number = next_big(s_age / 3600, add=add) if not repdigit else calculate_repdigit(int(s_age / 3600))
-    next = number * int(math.ceil((s_age / 3600) / number))
-    next_d = bday + timedelta(hours=next)
-    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]][
-        "hours"] + ':\n*' + datetime.strftime(
-        next_d, "%d.%m.%Y %H:%M")
-    if strings[chat_data['lang']]['seperator'] == "dot":
-        result = result.replace(',', '.')
-    return result, next_d
-
-
-def special_minutes(bday, s_age, chat_data, add=0, repdigit=False):
-    number = next_big(s_age / 60, add=add) if not repdigit else calculate_repdigit(int(s_age / 60))
-    next = number * int(math.ceil((s_age / 60) / number))
-    next_d = bday + timedelta(minutes=next)
-    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]][
-        "minutes"] + ':\n*' + datetime.strftime(next_d, "%d.%m.%Y %H:%M")
-    if strings[chat_data['lang']]['seperator'] == "dot":
-        result = result.replace(',', '.')
-    return result, next_d
-
-
-def special_seconds(bday, s_age, chat_data, add=0, repdigit=False):
-    number = next_big(s_age, add=add) if not repdigit else calculate_repdigit(int(s_age))
-    next = number * int(math.ceil(s_age / number))
-    next_d = bday + timedelta(seconds=next)
-    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]][
-        "seconds"] + ':\n*' + datetime.strftime(next_d, "%d.%m.%Y %H:%M:%S")
-    if strings[chat_data['lang']]['seperator'] == "dot":
-        result = result.replace(',', '.')
-    return result, next_d
-
-
-def next_repdigit(number):
-    for i in range(len(str(number))):
-        if str(number)[i:i + 1] > str(number)[:1]:
-            return False
-        elif str(number)[i:i + 1] < str(number)[:1]:
-            return True
-    return True
-
-
-def calculate_repdigit(number):
-    if next_repdigit(number):
-        result = int(str(number)[:1] * len(str(number)))
-    else:
-        result = int(str(int(str(number)[:1]) + 1) * len(str(number)))
-    return result
-
-
-def next_big(number, add=0):
-    result = math.ceil(number / int(str('1' + '0' * int(len(str(int(number))) - add))))
-    result = result * int(str('1' + '0' * int(len(str(int(number))) - add)))
-    return result
-
-
-def calculate_special_events(chat_data):
-    try:
-        return special_events(chat_data)
-    except ZeroDivisionError:
-        return "\n‼️‼️‼️\n" + strings[chat_data['lang']]['events_error'] + "\n‼️‼️‼️"
-
-def special_events(chat_data):
-    bday, tday = get_dates(chat_data)
-    d_age = (tday - bday).days
-    s_age = (tday - bday).total_seconds()
-
-    date_list = []
-    date_list.append(special_month(bday, d_age, chat_data, add=1))
-    date_list.append(special_month(bday, d_age, chat_data, add=2))
-    date_list.append(special_month(bday, d_age, chat_data, repdigit=True))
-    date_list.append(special_days(bday, d_age, chat_data, add=1))
-    date_list.append(special_days(bday, d_age, chat_data, add=2))
-    date_list.append(special_days(bday, d_age, chat_data, repdigit=True))
-    date_list.append(special_hours(bday, s_age, chat_data, add=1))
-    date_list.append(special_hours(bday, s_age, chat_data, add=2))
-    date_list.append(special_hours(bday, s_age, chat_data, repdigit=True))
-    date_list.append(special_minutes(bday, s_age, chat_data, add=1))
-    date_list.append(special_minutes(bday, s_age, chat_data, add=2))
-    date_list.append(special_minutes(bday, s_age, chat_data, repdigit=True))
-    date_list.append(special_seconds(bday, s_age, chat_data, add=1))
-    date_list.append(special_seconds(bday, s_age, chat_data, add=2))
-    date_list.append(special_seconds(bday, s_age, chat_data, repdigit=True))
-
-    date_list = list(set(date_list))
-    date_list = sorted(date_list, key=lambda x: x[1])
-    result = [x[0] for x in date_list]
-    return str(''.join(result))
-
-
-def calculate(chat_data):
-    result = strings[chat_data["lang"]]["age"] + ":\n" + time_since(chat_data) + "\n" + \
-             strings[chat_data["lang"]]["upcoming"] + ":\n" + time_to(chat_data)
-    return result
-
-
-def weekdays(chat_data):
-    d1 = datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
-    d2 = datetime.strptime(chat_data["gday"] + "." + chat_data["gmonth"] + "." + chat_data["gyear"], "%d.%m.%Y")
-    add = 1 if d1 < d2 else 0
-    days = strings[chat_data["lang"]]["days_list"].split(", ")
-    birthday = chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"]
-    birth_weekday = days[
-        int(datetime.strptime(chat_data["sday"] + "." + chat_data["smonth"] + "." + chat_data["syear"],
-                              "%d.%m.%Y").weekday())]
-    result = strings[chat_data["lang"]]["weekdays"] + ':\n' + birthday + ': *' + birth_weekday \
-             + "*\n----------------------------------------\n"
-    for i in range(10):
-        result = result + chat_data["sday"] + "." + chat_data["smonth"] + "." + str(
-            int(chat_data["gyear"]) + i + add) + ": *" + days[int(
-            datetime.strptime(
-                chat_data["sday"] + "." + chat_data["smonth"] + "." + str(int(chat_data["gyear"]) + i + add),
-                "%d.%m.%Y").weekday())] + "*\n"
-    return result
-
-
 def try_button(bot, update, chat_data):
     try:
         button(bot, update, chat_data)
@@ -437,9 +242,7 @@ def button(bot, update, chat_data):
     elif arg_one == "syear" or arg_one == "gyear" or arg_one == "bmin":
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
         if not "gday" in chat_data and not "gmonth" in chat_data and not "gyear" in chat_data:
-            chat_data["gday"] = datetime.now().strftime("%d")
-            chat_data["gmonth"] = datetime.now().strftime("%m")
-            chat_data["gyear"] = datetime.now().strftime("%Y")
+            Calculate.set_today(chat_data)
         update.callback_query.message.edit_text(
             get_text(chat_data) + "\n\n💡 " + strings[chat_data["lang"]]["action"] + ":",
             reply_markup=get_calc_keyboard(chat_data), parse_mode=ParseMode.MARKDOWN)
@@ -456,7 +259,7 @@ def button(bot, update, chat_data):
         chat_data['cur'] = arg_one
         log_user(update.callback_query.from_user, chat_data)
         try:
-            update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + calculate(chat_data),
+            update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + Calculate.calculate(chat_data),
                                                     parse_mode=ParseMode.MARKDOWN,
                                                     reply_markup=get_result_keyboard(0, chat_data))
         except ValueError:
@@ -466,12 +269,12 @@ def button(bot, update, chat_data):
                 reply_markup=get_calc_keyboard(chat_data), parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "total":
         chat_data['cur'] = arg_one
-        text = strings[chat_data["lang"]]["total"] + ":\n" + total_time(chat_data)
+        text = strings[chat_data["lang"]]["total"] + ":\n" + Calculate.total_time(chat_data)
         update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
                                                 reply_markup=get_result_keyboard(1, chat_data))
     elif arg_one == "next_birthdays":
         chat_data['cur'] = arg_one
-        text = weekdays(chat_data)
+        text = Calculate.weekdays(chat_data)
         update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
                                                 reply_markup=get_result_keyboard(2, chat_data))
     elif arg_one == "yes":
@@ -498,7 +301,7 @@ def button(bot, update, chat_data):
             reply_markup=get_number_kb(8, 8, 'bmin', limit=59, start_one=False), parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "special_events":
         chat_data['cur'] = arg_one
-        text = calculate_special_events(chat_data)
+        text = Calculate.calculate_special_events(chat_data)
         update.callback_query.message.edit_text(get_text(chat_data) + "\n" + text, parse_mode=ParseMode.MARKDOWN,
                                                 reply_markup=get_result_keyboard(3, chat_data))
     elif arg_one in strings:
@@ -514,6 +317,7 @@ def main():
 
     global strings
     strings = get_yml("./strings.yml")
+    Calculate.set_strings(strings)
 
     updater = Updater(get_yml('./config.yml')['agecalculator']['bottoken'])
 
