@@ -16,10 +16,13 @@ def custom_str_constructor(loader, node):
     return loader.construct_scalar(node).encode('utf-8')
 
 
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO, filename='error.log')
-
-logger = logging.getLogger(__name__)
+def log():
+    form = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    if get_yml('./config.yml')['agecalculator']['debug']:
+        logging.basicConfig(format=form, level=logging.DEBUG)
+    else:
+        logging.basicConfig(format=form, level=logging.INFO, filename='error.log')
+    logger = logging.getLogger(__name__)
 
 
 def get_yml(file):
@@ -499,6 +502,7 @@ def button(bot, update, chat_data):
 
 def main():
     yaml.add_constructor(u'tag:yaml.org,2002:str', custom_str_constructor)
+    log()
 
     global strings
     strings = get_yml("./strings.yml")
