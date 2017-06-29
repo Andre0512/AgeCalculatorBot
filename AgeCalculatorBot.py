@@ -338,6 +338,12 @@ def next_big(number, add=0):
     return result
 
 
+def calculate_special_events(chat_data):
+    try:
+        return special_events(chat_data)
+    except ZeroDivisionError:
+        return "\n‼️‼️‼️\n" + strings[chat_data['lang']]['events_error'] + "\n‼️‼️‼️"
+
 def special_events(chat_data):
     bday, tday = get_dates(chat_data)
     d_age = (tday - bday).days
@@ -396,14 +402,16 @@ def try_button(bot, update, chat_data):
     try:
         button(bot, update, chat_data)
     except KeyError:
+        chat_data.pop("new", None)
         if not "lang" in chat_data:
             chat_data["lang"] = get_language(update.callback_query.from_user)
         send(bot, update.callback_query, chat_data)
 
 
 def log_user(user, chat_data):
+    language_code = user.language_code if user.language_code else ''
     name = user.first_name + " " + user.last_name if user.last_name else user.first_name
-    log = ("\n" + name + " " + str(user.id) + " " + user.language_code +
+    log = ("\n" + name + " " + str(user.id) + " " + language_code +
            " (" + str(chat_data['sday']) + "." + str(chat_data['smonth']) + "." + str(chat_data['syear']) + ")")
     file = open("age_log.txt", "a")
     file.write(log)
@@ -490,7 +498,7 @@ def button(bot, update, chat_data):
             reply_markup=get_number_kb(8, 8, 'bmin', limit=59, start_one=False), parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "special_events":
         chat_data['cur'] = arg_one
-        text = special_events(chat_data)
+        text = calculate_special_events(chat_data)
         update.callback_query.message.edit_text(get_text(chat_data) + "\n" + text, parse_mode=ParseMode.MARKDOWN,
                                                 reply_markup=get_result_keyboard(3, chat_data))
     elif arg_one in strings:

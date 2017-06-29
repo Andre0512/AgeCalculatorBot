@@ -48,6 +48,7 @@ de:
   b_min: die Minute deiner Geburt ein
   events: Besondere
   seperator: dot
+  events_error: Die Berechnung von speziellen Jubiläen ist nur mit einem Geburstag möglich, der über einen Monat in der Vergangenheit liegt.
 en:
   day: Day
   month: Month
@@ -60,7 +61,7 @@ en:
   years: years
   hours: hours
   minutes: minutes
-  seconds: secondes
+  seconds: seconds
   early: Earlier
   late: Later
   birthday: Birthday
@@ -98,3 +99,4 @@ en:
   b_min: the minute of your birth
   events: Special
   seperator: comma
+  events_error: The calculation of special anniversaries is only possible with a birth day, which is over a month in the past.
