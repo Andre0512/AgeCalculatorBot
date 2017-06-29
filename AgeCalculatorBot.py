@@ -265,7 +265,8 @@ def special_days(bday, d_age, chat_data, add=0, repdigit=False):
     number = next_big(d_age, add=add) if not repdigit else calculate_repdigit(int(d_age))
     next = number * int(math.ceil(d_age / number))
     next_d = bday + timedelta(days=next)
-    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]]["days"] + ':\n*' + datetime.strftime(
+    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]][
+        "days"] + ':\n*' + datetime.strftime(
         next_d, "%d.%m.%Y")
     if strings[chat_data['lang']]['seperator'] == "dot":
         result = result.replace(',', '.')
@@ -276,7 +277,8 @@ def special_hours(bday, s_age, chat_data, add=0, repdigit=False):
     number = next_big(s_age / 3600, add=add) if not repdigit else calculate_repdigit(int(s_age / 3600))
     next = number * int(math.ceil((s_age / 3600) / number))
     next_d = bday + timedelta(hours=next)
-    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]]["hours"] + ':\n*' + datetime.strftime(
+    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]][
+        "hours"] + ':\n*' + datetime.strftime(
         next_d, "%d.%m.%Y %H:%M")
     if strings[chat_data['lang']]['seperator'] == "dot":
         result = result.replace(',', '.')
@@ -382,17 +384,13 @@ def weekdays(chat_data):
     return result
 
 
-def _try_button(bot, update, chat_data):
+def try_button(bot, update, chat_data):
     try:
         button(bot, update, chat_data)
     except KeyError:
         if not "lang" in chat_data:
             chat_data["lang"] = get_language(update.callback_query.from_user)
         send(bot, update.callback_query, chat_data)
-
-
-def try_button(bot, update, chat_data):
-    button(bot, update, chat_data)
 
 
 def log_user(user, chat_data):
