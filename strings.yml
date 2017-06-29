@@ -46,7 +46,7 @@ de:
   action: Bitte korrigiere deine Eingaben oder berechne jetzt
   b_hour: die Stunde deiner Geburt ein
   b_min: die Minute deiner Geburt ein
-  events: Besondere Tage
+  events: Besondere
   seperator: dot
 en:
   day: Day
@@ -96,5 +96,5 @@ en:
   action: Please correct your inputs or calculate now
   b_hour: the hour of your birth
   b_min: the minute of your birth
-  events: Special events
+  events: Special
   seperator: comma

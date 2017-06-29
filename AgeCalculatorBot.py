@@ -168,7 +168,7 @@ def get_result_keyboard(selected, chat_data):
                  InlineKeyboardButton("🌟 " + strings[chat_data["lang"]]["rate"],
                                       url='https://telegram.me/storebot?start=AgeCalculatorBot'),
                  InlineKeyboardButton("➕ " + strings[chat_data["lang"]]["new"], callback_data="new")]]
-    return InlineKeyboardMarkup(keyboard)
+    return InlineKeyboardMarkup(keyboard) if not 'new' in chat_data else None
 
 
 def get_calc_keyboard(chat_data):
@@ -240,12 +240,15 @@ def total_time(chat_data):
     seconds = diff.seconds
 
     result = "*" + str('{0:,}'.format(int(days / 365.25))) + "* " + strings[chat_data["lang"]]["years"] + "\n"
-    result = result + "*" + str('{0:,}'.format(int(days / 30.4375))) + "* " + strings[chat_data["lang"]]["months"] + "\n"
+    result = result + "*" + str('{0:,}'.format(int(days / 30.4375))) + "* " + strings[chat_data["lang"]][
+        "months"] + "\n"
     result = result + "*" + str('{0:,}'.format(int(days))) + "* " + strings[chat_data["lang"]]["days"] + "\n"
-    result = result + "*" + str('{0:,}'.format(int(days * 24 + seconds / 3600))) + "* " + strings[chat_data["lang"]]["hours"] + "\n"
+    result = result + "*" + str('{0:,}'.format(int(days * 24 + seconds / 3600))) + "* " + strings[chat_data["lang"]][
+        "hours"] + "\n"
     result = result + "*" + str('{0:,}'.format(int(days * 24 * 60 + seconds / 60))) + "* " + strings[chat_data["lang"]][
         "minutes"] + "\n"
-    result = result + "*" + str('{0:,}'.format(int(days * 24 * 3600 + seconds))) + "* " + strings[chat_data["lang"]]["seconds"] + "\n"
+    result = result + "*" + str('{0:,}'.format(int(days * 24 * 3600 + seconds))) + "* " + strings[chat_data["lang"]][
+        "seconds"] + "\n"
     if strings[chat_data['lang']]['seperator'] == "dot":
         result = result.replace(',', '.')
     return result
@@ -406,7 +409,7 @@ def log_user(user, chat_data):
 
 def button(bot, update, chat_data):
     update.callback_query.answer()
-    arg_one = update.callback_query.data.split(" ")[0]
+    arg_one = update.callback_query.data.split(" ")[0] if not 'new' in chat_data  else chat_data['cur']
     if arg_one == "sday" or arg_one == "gday":
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
         month = strings[chat_data["lang"]]["month_list"].split(", ")
@@ -439,6 +442,7 @@ def button(bot, update, chat_data):
             reply_markup=keyboard,
             parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "calc":
+        chat_data['cur'] = arg_one
         log_user(update.callback_query.from_user, chat_data)
         try:
             update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + calculate(chat_data),
@@ -450,10 +454,12 @@ def button(bot, update, chat_data):
                 strings[chat_data["lang"]]["try_again"] + ":",
                 reply_markup=get_calc_keyboard(chat_data), parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "total":
+        chat_data['cur'] = arg_one
         text = strings[chat_data["lang"]]["total"] + ":\n" + total_time(chat_data)
         update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
                                                 reply_markup=get_result_keyboard(1, chat_data))
     elif arg_one == "next_birthdays":
+        chat_data['cur'] = arg_one
         text = weekdays(chat_data)
         update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
                                                 reply_markup=get_result_keyboard(2, chat_data))
@@ -462,8 +468,10 @@ def button(bot, update, chat_data):
         start(bot, update, chat_data)
         send(bot, update.callback_query, chat_data)
     elif arg_one == "new":
-        update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + calculate(chat_data),
-                                                parse_mode=ParseMode.MARKDOWN)
+        chat_data['new'] = True
+        button(bot, update, chat_data)
+        chat_data.pop("new", None)
+        chat_data.pop("cur", None)
         send(bot, update.callback_query, chat_data)
     elif arg_one == "add_time":
         update.callback_query.message.edit_text(
@@ -476,8 +484,9 @@ def button(bot, update, chat_data):
         update.callback_query.message.edit_text(
             get_text(chat_data) + "\n\n💡 " + strings[chat_data["lang"]]["action_start"] + " " +
             strings[chat_data["lang"]]["b_min"] + ":",
-            reply_markup=get_number_kb(8, 8, 'bmin', limit=60, start_one=False), parse_mode=ParseMode.MARKDOWN)
+            reply_markup=get_number_kb(8, 8, 'bmin', limit=59, start_one=False), parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "special_events":
+        chat_data['cur'] = arg_one
         text = special_events(chat_data)
         update.callback_query.message.edit_text(get_text(chat_data) + "\n" + text, parse_mode=ParseMode.MARKDOWN,
                                                 reply_markup=get_result_keyboard(3, chat_data))
