@@ -252,9 +252,9 @@ def total_time(chat_data):
 def special_month(bday, d_age, chat_data, add=0, repdigit=False):
     number = next_big(d_age / 30.4375, add=add) if not repdigit else calculate_repdigit(int(d_age / 30.4375))
     month = strings[chat_data["lang"]]["month_list"].split(", ")
-    next = number * int(math.ceil((d_age / 30.4375) / number)) + add
+    next = number * int(math.ceil((d_age / 30.4375) / number))
     next_d = bday + timedelta(days=next * 30.4375)
-    result = '\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]]["months"] + ': *' + str(
+    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]]["months"] + ':\n*' + str(
         month[next_d.date().month - 1]) + '. ' + str(next_d.date().year)
     if strings[chat_data['lang']]['seperator'] == "dot":
         result = result.replace(',', '.')
@@ -265,7 +265,7 @@ def special_days(bday, d_age, chat_data, add=0, repdigit=False):
     number = next_big(d_age, add=add) if not repdigit else calculate_repdigit(int(d_age))
     next = number * int(math.ceil(d_age / number))
     next_d = bday + timedelta(days=next)
-    result = '\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]]["days"] + ': *' + datetime.strftime(
+    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]]["days"] + ':\n*' + datetime.strftime(
         next_d, "%d.%m.%Y")
     if strings[chat_data['lang']]['seperator'] == "dot":
         result = result.replace(',', '.')
@@ -276,7 +276,7 @@ def special_hours(bday, s_age, chat_data, add=0, repdigit=False):
     number = next_big(s_age / 3600, add=add) if not repdigit else calculate_repdigit(int(s_age / 3600))
     next = number * int(math.ceil((s_age / 3600) / number))
     next_d = bday + timedelta(hours=next)
-    result = '\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]]["hours"] + ': *' + datetime.strftime(
+    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]]["hours"] + ':\n*' + datetime.strftime(
         next_d, "%d.%m.%Y %H:%M")
     if strings[chat_data['lang']]['seperator'] == "dot":
         result = result.replace(',', '.')
@@ -287,8 +287,8 @@ def special_minutes(bday, s_age, chat_data, add=0, repdigit=False):
     number = next_big(s_age / 60, add=add) if not repdigit else calculate_repdigit(int(s_age / 60))
     next = number * int(math.ceil((s_age / 60) / number))
     next_d = bday + timedelta(minutes=next)
-    result = '\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]][
-        "minutes"] + ': *' + datetime.strftime(next_d, "%d.%m.%Y %H:%M")
+    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]][
+        "minutes"] + ':\n*' + datetime.strftime(next_d, "%d.%m.%Y %H:%M")
     if strings[chat_data['lang']]['seperator'] == "dot":
         result = result.replace(',', '.')
     return result, next_d
@@ -298,8 +298,8 @@ def special_seconds(bday, s_age, chat_data, add=0, repdigit=False):
     number = next_big(s_age, add=add) if not repdigit else calculate_repdigit(int(s_age))
     next = number * int(math.ceil(s_age / number))
     next_d = bday + timedelta(seconds=next)
-    result = '\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]][
-        "seconds"] + ': *' + datetime.strftime(next_d, "%d.%m.%Y %H:%M:%S")
+    result = '\n\n*' + str('{0:,}'.format(next)) + ' ' + strings[chat_data["lang"]][
+        "seconds"] + ':\n*' + datetime.strftime(next_d, "%d.%m.%Y %H:%M:%S")
     if strings[chat_data['lang']]['seperator'] == "dot":
         result = result.replace(',', '.')
     return result, next_d
@@ -335,23 +335,25 @@ def special_events(chat_data):
 
     date_list = []
     date_list.append(special_month(bday, d_age, chat_data, add=1))
-    date_list.append(special_month(bday, d_age, chat_data))
+    date_list.append(special_month(bday, d_age, chat_data, add=2))
     date_list.append(special_month(bday, d_age, chat_data, repdigit=True))
     date_list.append(special_days(bday, d_age, chat_data, add=1))
-    date_list.append(special_days(bday, d_age, chat_data))
+    date_list.append(special_days(bday, d_age, chat_data, add=2))
     date_list.append(special_days(bday, d_age, chat_data, repdigit=True))
     date_list.append(special_hours(bday, s_age, chat_data, add=1))
-    date_list.append(special_hours(bday, s_age, chat_data))
+    date_list.append(special_hours(bday, s_age, chat_data, add=2))
     date_list.append(special_hours(bday, s_age, chat_data, repdigit=True))
     date_list.append(special_minutes(bday, s_age, chat_data, add=1))
-    date_list.append(special_minutes(bday, s_age, chat_data))
+    date_list.append(special_minutes(bday, s_age, chat_data, add=2))
     date_list.append(special_minutes(bday, s_age, chat_data, repdigit=True))
     date_list.append(special_seconds(bday, s_age, chat_data, add=1))
-    date_list.append(special_seconds(bday, s_age, chat_data))
+    date_list.append(special_seconds(bday, s_age, chat_data, add=2))
     date_list.append(special_seconds(bday, s_age, chat_data, repdigit=True))
 
+    date_list = list(set(date_list))
     date_list = sorted(date_list, key=lambda x: x[1])
-    return str(''.join([x[0] for x in date_list]))
+    result = [x[0] for x in date_list]
+    return str(''.join(result))
 
 
 def calculate(chat_data):
