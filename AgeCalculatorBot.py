@@ -10,10 +10,12 @@ from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
 
+# Custom constructor to read yaml with utf-8 encoding
 def custom_str_constructor(loader, node):
     return loader.construct_scalar(node).encode('utf-8')
 
 
+# Logging events
 def log():
     form = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     if get_yml('./config.yml')['agecalculator']['debug']:
@@ -23,6 +25,7 @@ def log():
     logger = logging.getLogger(__name__)
 
 
+# Read yaml file into string
 def get_yml(file):
     result = {}
     with open(os.path.join(os.path.dirname(__file__), file), 'rb') as ymlfile:
@@ -32,6 +35,7 @@ def get_yml(file):
     return result
 
 
+# decode bytes dictionary
 def dict_byte_to_str(v):
     result = {}
     if hasattr(v, 'items'):
@@ -46,6 +50,7 @@ def dict_byte_to_str(v):
     return result
 
 
+# Keyboard with year numbers
 def get_year_kb(c, r, year, arg, chat_data):
     row = []
     std_year = year
@@ -62,6 +67,7 @@ def get_year_kb(c, r, year, arg, chat_data):
     return InlineKeyboardMarkup(row)
 
 
+# Get number keyboard given dimensions
 def get_number_kb(c, r, callback, limit=99, name_list=(), start_one=True):
     row = []
     for i in range(r):
@@ -76,6 +82,7 @@ def get_number_kb(c, r, callback, limit=99, name_list=(), start_one=True):
     return InlineKeyboardMarkup(row)
 
 
+# Find out the users lanugage
 def get_language(user):
     if user.language_code:
         language_code = user.language_code[:2]
@@ -83,6 +90,7 @@ def get_language(user):
     return 'en'
 
 
+# Start dialog
 def start(bot, update, chat_data):
     user = update.callback_query.from_user if update.callback_query else update.message.from_user
     if not "lang" in chat_data:
@@ -95,6 +103,7 @@ def start(bot, update, chat_data):
           + " ✌🏻\n" + text, reply_markup=get_lang_keyboard(chat_data))
 
 
+# Try to send keyboard and catch error for no language
 def send(bot, update, chat_data):
     try:
         keyboard = get_number_kb(8, 4, "sday", limit=31)
@@ -112,6 +121,7 @@ def send(bot, update, chat_data):
         send(bot, update, chat_data)
 
 
+# Add navigation buttons for yearkeyboard
 def navigate_year(update, chat_data, arg):
     new_year = int(update.callback_query.data.split(" ")[1])
     new_year = new_year + 12 if arg == "gnext" or arg == "snext" else new_year - 12
@@ -120,6 +130,7 @@ def navigate_year(update, chat_data, arg):
                                             parse_mode=ParseMode.MARKDOWN)
 
 
+# Generate text for the input dialog
 def get_text(chat_data, time=False):
     result = strings[chat_data["lang"]]["birthday"] + ": *"
     result = result + str(chat_data["sday"]) + "." if "sday" in chat_data else result + "xx."
@@ -136,6 +147,7 @@ def get_text(chat_data, time=False):
     return result
 
 
+# Get keyboard for choosing language
 def get_lang_keyboard(chat_data):
     if "confirmed" in chat_data:
         chat_data.pop("confirmed", None)
@@ -155,6 +167,7 @@ def get_lang_keyboard(chat_data):
         return InlineKeyboardMarkup(keyboard)
 
 
+# Get inline keyboard for result dialog
 def get_result_keyboard(selected, chat_data):
     current = [" ", " ", " ", " "]
     current[selected] = " ☑️"
@@ -172,6 +185,7 @@ def get_result_keyboard(selected, chat_data):
     return InlineKeyboardMarkup(keyboard) if not 'new' in chat_data else None
 
 
+# Get keyboard for correct inputs dialog
 def get_calc_keyboard(chat_data):
     birth_time = "➕ " + strings[chat_data["lang"]]["add_time"] if not "bhour" in chat_data else "✏️ " + strings[
         chat_data["lang"]]["correct_time"]
@@ -184,6 +198,7 @@ def get_calc_keyboard(chat_data):
     return InlineKeyboardMarkup(keyboard)
 
 
+# Get text for action hint
 def get_action(arg, chat_data):
     if arg[1:] == "day":
         period = strings[chat_data["lang"]]["t_day"]
@@ -198,11 +213,14 @@ def get_action(arg, chat_data):
     return "\n\n💡 " + strings[chat_data["lang"]]["action_start"] + " " + period + " " + day + ":"
 
 
+# Delete chat_data for new inputs
 def delete_date(chat_data, arg):
     chat_data.pop(arg + "year", None)
     chat_data.pop(arg + "month", None)
     chat_data.pop(arg + "day", None)
 
+
+# Try to answer button press, catch error for no language
 def try_button(bot, update, chat_data):
     try:
         button(bot, update, chat_data)
@@ -213,6 +231,7 @@ def try_button(bot, update, chat_data):
         send(bot, update.callback_query, chat_data)
 
 
+# Logging user requests for determine the usage
 def log_user(user, chat_data):
     language_code = user.language_code if user.language_code else ''
     name = user.first_name + " " + user.last_name if user.last_name else user.first_name
@@ -223,6 +242,7 @@ def log_user(user, chat_data):
     file.close()
 
 
+# Sending replys to button requests
 def button(bot, update, chat_data):
     update.callback_query.answer()
     arg_one = update.callback_query.data.split(" ")[0] if not 'new' in chat_data  else chat_data['cur']
@@ -311,6 +331,7 @@ def button(bot, update, chat_data):
         send(bot, update.callback_query, chat_data)
 
 
+# Intialize Telegram bot and start polling
 def main():
     yaml.add_constructor(u'tag:yaml.org,2002:str', custom_str_constructor)
     log()
@@ -331,6 +352,7 @@ def main():
     updater.idle()
 
 
+# Log errors for unexcepted crashes
 def err():
     bot = Bot(get_yml('./config.yml')['agecalculator']['bottoken'])
     try:
