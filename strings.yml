@@ -100,3 +100,56 @@ en:
   events: Special
   seperator: comma
   events_error: The calculation of special anniversaries is only possible with a birth day, which is over a month in the past.
+az:
+  day: Gün
+  month: Ay
+  year: İl
+  t_day: the day
+  t_month: the month
+  t_year: the year
+  days: günlər
+  months: aylar
+  years: illər
+  hours: saatlar
+  minutes: dəqiqələr
+  seconds: saniyələr
+  early: Daha tez
+  late: Daha sonra
+  birthday: Doğum günü
+  t_birthday: of your birthday
+  todays_date: Bu günkü tarix
+  t_todays_date: of today's date
+  today: Bu gün
+  other_date: Başqa tarix
+  age: Yaş
+  total: Toplam
+  upcoming: Gələn doğum günü
+  calc: Hesabla
+  correct_bday: Doğum gününüzə düzəliş edin.
+  correct_today: Bu günkü tarixə düzəliş edin.
+  action_start: Xahiş edirik, yazın:
+  next: Sonrakı
+  error: Yalnışlıq! Uyğunsuz tarix.
+  try_again: Verilənlərinizə düzəliş edərdiniz.
+  month_list: Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
+  days_list: Birinci gün, İkinci gün, Üçüncü gün, Dördüncü gün, Beşinci gün, Altıncı gün, Yeddinci gün
+  weekdays: Həftənin günləri
+  greeting: Salam
+  question: Your language is English, right?
+  ger_lang: German
+  eng_lang: English
+  aze_lang: Azərbaycan dili
+  ja: Düzdür.
+  nein: Yox
+  ok: Okay, your language is English! Now calculate your age
+  new: Yeni
+  rate: Ulduz verin
+  contribute: Qatqı
+  add_time: Doğum tarixi artırın.
+  correct_time: Doğum tarixinizə düzəliş edin.
+  action: Verdiklərinizə düzəliş edin vəya indi hesablayın.
+  b_hour: Doğumunuzun saatı:
+  b_min: Doğumunuzun dəqiqəsi:
+  events: özəl
+  seperator: comma
+  events_error: Özəl anların hesablanması ancaq bir ayı dolmuş doğum dünü üçün ola bilər.
