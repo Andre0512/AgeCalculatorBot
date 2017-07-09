@@ -19,17 +19,17 @@
 * Calculates special events e.g. the date when you get 1,000,000 hours old
 * Simple interface for inserting date
 * All inputs throug inline buttons
-* Choose your lanugage (at the moment english and german available)
+* Choose your lanugage (at the moment english, german and azerbaijani available)
 
 ## Installation
 
-#### Clone Repository:
+#### Clone Repository
 ```
 git clone https://github.com/Andre0512/AgeCalculatorBot.git
 cd AgeCalculatorBot/
 ```
 
-#### Install Telegram framework and yaml support:
+#### Install Telegram framework and yaml support
 ```
 pip3 install python-telegram-bot pyyaml
 ```
@@ -55,12 +55,12 @@ python3 AgeCalculatorBot.py &
 ### Input dialogs
 <img src="images/insert_data.png" width="800"/>
 
-## Special thanks:
+## Special thanks
 
-#### For translating:
+#### For translating
 * Azerbaijani: [@Sazi_z](https://t.me/sazi_z) 
 
-## License:
+## License
 This project stands under GNU General Public License.
 
 Contributions to are welcomed. Tell me if you have a good idea for the project or do a pull request.
