@@ -34,7 +34,7 @@ de:
   weekdays: Wochentage
   greeting: Hallo
   question: Deine Sprache ist Deutsch, richtig?
-  other_lang: Englisch
+  this_lang: Deutsch
   ja: Richitg
   nein: Nein
   ok: Okay, deine Sprache ist Deutsch! Berechne jetzt dein Alter
@@ -49,6 +49,7 @@ de:
   events: Besondere
   seperator: dot
   events_error: Die Berechnung von speziellen Jubiläen ist nur mit einem Geburstag möglich, der über einen Monat in der Vergangenheit liegt.
+  flag: \U0001f1e9\U0001f1ea
 en:
   day: Day
   month: Month
@@ -85,7 +86,7 @@ en:
   weekdays: Weekdays
   greeting: Hello
   question: Your language is English, right?
-  other_lang: German
+  this_lang: English
   ja: Right
   nein: Nope
   ok: Okay, your language is English! Now calculate your age
@@ -100,6 +101,7 @@ en:
   events: Special
   seperator: comma
   events_error: The calculation of special anniversaries is only possible with a birth day, which is over a month in the past.
+  flag: \U0001f1ec\U0001f1e7
 az:
   day: Gün
   month: Ay
@@ -127,7 +129,7 @@ az:
   calc: Hesabla
   correct_bday: Doğum gününüzə düzəliş edin.
   correct_today: Bu günkü tarixə düzəliş edin.
-  action_start: Xahiş edirik, yazın:
+  action_start: Xahiş edirik, yazın
   next: Sonrakı
   error: Yalnışlıq! Uyğunsuz tarix.
   try_again: Verilənlərinizə düzəliş edərdiniz.
@@ -136,9 +138,7 @@ az:
   weekdays: Həftənin günləri
   greeting: Salam
   question: Your language is English, right?
-  ger_lang: German
-  eng_lang: English
-  aze_lang: Azərbaycan dili
+  this_lang: Azərbaycan dili
   ja: Düzdür.
   nein: Yox
   ok: Okay, your language is English! Now calculate your age
@@ -148,8 +148,9 @@ az:
   add_time: Doğum tarixi artırın.
   correct_time: Doğum tarixinizə düzəliş edin.
   action: Verdiklərinizə düzəliş edin vəya indi hesablayın.
-  b_hour: Doğumunuzun saatı:
-  b_min: Doğumunuzun dəqiqəsi:
+  b_hour: Doğumunuzun saatı
+  b_min: Doğumunuzun dəqiqəsi
   events: özəl
   seperator: comma
   events_error: Özəl anların hesablanması ancaq bir ayı dolmuş doğum dünü üçün ola bilər.
+  flag: \U0001f1e6\U0001f1ff

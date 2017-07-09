@@ -147,23 +147,25 @@ def get_text(chat_data, time=False):
     return result
 
 
+#decode flags for string file
+#print('🇦🇿'.encode('unicode-escape'))
+
+
 # Get keyboard for choosing language
 def get_lang_keyboard(chat_data):
     if "confirmed" in chat_data:
         chat_data.pop("confirmed", None)
         return None
     else:
-        if chat_data["lang"] == "de":
-            emoji = "🇬🇧"
-            callback = "en"
-        else:
-            emoji = "🇩🇪"
-            callback = "de"
-        keyboard = [[InlineKeyboardButton("✔️ " + strings[chat_data["lang"]]["ja"], callback_data="yes")],
-                    [InlineKeyboardButton(
-                        strings[chat_data["lang"]]["nein"] + ", " + strings[chat_data["lang"]][
-                            "other_lang"] + " " + emoji,
-                        callback_data=callback)]]
+        keyboard = []
+        for lang in strings:
+            if lang == chat_data["lang"]:
+                keyboard.insert(0,
+                                [InlineKeyboardButton("✔️ " + strings[chat_data["lang"]]["ja"], callback_data="yes")])
+            else:
+                keyboard.append([InlineKeyboardButton(
+                    strings[lang]["nein"] + ", " + strings[lang]["this_lang"] + " " + strings[lang]["flag"].encode('utf-8').decode('unicode-escape'),
+                    callback_data=lang)])
         return InlineKeyboardMarkup(keyboard)
 
 
@@ -366,6 +368,7 @@ def err():
 
 
 if __name__ == '__main__':
+    main()
     while True:
         try:
             main()
