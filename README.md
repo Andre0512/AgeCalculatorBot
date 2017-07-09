@@ -9,6 +9,7 @@
 [Functions](#functions)  
 [Installation](#installation)  
 [Screenshots](#screenshots)  
+[Special thanks](#special-thanks)  
 [License](#license)  
 
 ## Functions
@@ -53,6 +54,11 @@ python3 AgeCalculatorBot.py &
 
 ### Input dialogs
 <img src="images/insert_data.png" width="800"/>
+
+## Special thanks:
+
+#### For translating:
+* Azerbaijani: [@Sazi_z](https://t.me/sazi_z) 
 
 ## License:
 This project stands under GNU General Public License.
