@@ -16,6 +16,7 @@ en:
   today: Today
   other_date: Other date
   calc: Calculate
+  upcoming: Next birthday
   age: Age
   total: Total
   events: Special
@@ -72,6 +73,7 @@ de:
   other_date: Anderes Datum
   age: Alter
   total: Absolut
+  upcoming: Nächster Geburtstag
   calc: Berechnen
   correct_bday: Korrigiere Geburtstag
   correct_today: Korrigiere heutiges Datum
@@ -123,6 +125,7 @@ az:
   other_date: Başqa tarix
   age: Yaş
   total: Toplam
+  upcoming: Gələn doğum günü
   calc: Hesabla
   correct_bday: Doğum gününüzə düzəliş edin.
   correct_today: Bu günkü tarixə düzəliş edin.

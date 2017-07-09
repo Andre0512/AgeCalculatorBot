@@ -18,7 +18,7 @@ def custom_str_constructor(loader, node):
 # Logging events
 def log():
     form = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    if get_yml('./config.yml')['agecalculator']['debug']:
+    if cfg['agecalculator']['debug']:
         logging.basicConfig(format=form, level=logging.DEBUG)
     else:
         logging.basicConfig(format=form, level=logging.INFO, filename='error.log')
@@ -224,13 +224,16 @@ def delete_date(chat_data, arg):
 
 # Try to answer button press, catch error for no language
 def try_button(bot, update, chat_data):
-    try:
+    if cfg['agecalculator']['debug']:
         button(bot, update, chat_data)
-    except KeyError:
-        chat_data.pop("new", None)
-        if not "lang" in chat_data:
-            chat_data["lang"] = get_language(update.callback_query.from_user)
-        send(bot, update.callback_query, chat_data)
+    else:
+        try:
+            button(bot, update, chat_data)
+        except KeyError:
+            chat_data.pop("new", None)
+            if not "lang" in chat_data:
+                chat_data["lang"] = get_language(update.callback_query.from_user)
+            send(bot, update.callback_query, chat_data)
 
 
 # Logging user requests for determine the usage
@@ -335,18 +338,17 @@ def button(bot, update, chat_data):
 
 # Intialize Telegram bot and start polling
 def main():
-    yaml.add_constructor(u'tag:yaml.org,2002:str', custom_str_constructor)
     log()
 
     global strings
     strings = get_yml("./strings.yml")
     Calculate.set_strings(strings)
 
-    updater = Updater(get_yml('./config.yml')['agecalculator']['bottoken'])
+    updater = Updater(cfg['agecalculator']['bottoken'])
 
     dp = updater.dispatcher
 
-    dp.add_handler(CommandHandler("start", start, pass_chat_data=True))
+    dp.add_handler(CommandHandler("start", start, pass_chat_data=True, ))
     dp.add_handler(MessageHandler(Filters.text, send, pass_chat_data=True))
     dp.add_handler(CallbackQueryHandler(try_button, pass_chat_data=True))
 
@@ -356,21 +358,27 @@ def main():
 
 # Log errors for unexcepted crashes
 def err():
-    bot = Bot(get_yml('./config.yml')['agecalculator']['bottoken'])
+    bot = Bot(cfg['agecalculator']['bottoken'])
     try:
-        bot.sendMessage(chat_id=get_yml('./config.yml')['agecalculator']['errorid'],
+        bot.sendMessage(chat_id=cfg['agecalculator']['errorid'],
                         text='Crawler fehlgeschalgen: ```' + traceback.format_exc() + '```',
                         disable_notification=True, parse_mode=ParseMode.MARKDOWN)
     except:
-        bot.sendMessage(chat_id=get_yml('./config.yml')['agecalculator']['errorid'],
+        bot.sendMessage(chat_id=cfg['agecalculator']['errorid'],
                         text='Crawler fehlgeschalgen: \n' + traceback.format_exc(),
                         disable_notification=True)
 
 
 if __name__ == '__main__':
-    while True:
-        try:
-            main()
-            err()
-        except:
-            err()
+    yaml.add_constructor(u'tag:yaml.org,2002:str', custom_str_constructor)
+    global cfg
+    cfg = get_yml('./config.yml')
+    if cfg['agecalculator']['debug']:
+        main()
+    else:
+        while True:
+            try:
+                main()
+                err()
+            except:
+                err()
