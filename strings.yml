@@ -1,3 +1,54 @@
+en:
+  day: Day
+  month: Month
+  year: Year
+  days: days
+  months: months
+  years: years
+  hours: hours
+  minutes: minutes
+  seconds: seconds
+  early: Earlier
+  late: Later
+  weekdays: Weekdays
+  birthday: Birthday
+  todays_date: Today's date
+  today: Today
+  other_date: Other date
+  calc: Calculate
+  age: Age
+  total: Total
+  events: Special
+  next: Next
+  new: New
+  rate: Rate
+  contribute: Contrib
+  correct_bday: Correct birthday
+  correct_today: Correct today's date
+  instruction: Please enter
+  t_day: the day
+  t_month: the month
+  t_year: the year
+  t_todays_date: of today's date
+  t_birthday: of your birthday
+  b_hour: the hour of your birth
+  b_min: the minute of your birth
+  greeting: Hello
+  question: Your language is English, right?
+  ok: Okay, your language is English! Now calculate your age
+  this_lang: English
+  ja: Right
+  nein: Nope
+  add_time: Add birth time
+  correct_time: Correct birth time
+  action: Please correct your inputs or calculate now
+  error: Error, invalid date
+  try_again: Please correct your data
+  events_error: The calculation of special anniversaries is only possible with a birth day, which is over a month in the past.
+  month_list: Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
+  days_list: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
+  seperator: comma
+  flag: \U0001f1ec\U0001f1e7
 de:
   day: Tag
   month: Monat
@@ -21,11 +72,10 @@ de:
   other_date: Anderes Datum
   age: Alter
   total: Absolut
-  upcoming: Nächster Geburtstag
   calc: Berechnen
   correct_bday: Korrigiere Geburtstag
   correct_today: Korrigiere heutiges Datum
-  action_start: Bitte gebe
+  instruction: Bitte gebe
   next: Nächste
   error: Achtung, ungültiges Datum
   try_again: Korrigiere deine Eingaben
@@ -50,58 +100,6 @@ de:
   seperator: dot
   events_error: Die Berechnung von speziellen Jubiläen ist nur mit einem Geburstag möglich, der über einen Monat in der Vergangenheit liegt.
   flag: \U0001f1e9\U0001f1ea
-en:
-  day: Day
-  month: Month
-  year: Year
-  t_day: the day
-  t_month: the month
-  t_year: the year
-  days: days
-  months: months
-  years: years
-  hours: hours
-  minutes: minutes
-  seconds: seconds
-  early: Earlier
-  late: Later
-  birthday: Birthday
-  t_birthday: of your birthday
-  todays_date: Today's date
-  t_todays_date: of today's date
-  today: Today
-  other_date: Other date
-  age: Age
-  total: Total
-  upcoming: Next birthday
-  calc: Calculate
-  correct_bday: Correct birthday
-  correct_today: Correct today's date
-  action_start: Please enter
-  next: Next
-  error: Error, invalid date
-  try_again: Please correct your data
-  month_list: Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
-  days_list: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
-  weekdays: Weekdays
-  greeting: Hello
-  question: Your language is English, right?
-  this_lang: English
-  ja: Right
-  nein: Nope
-  ok: Okay, your language is English! Now calculate your age
-  new: New
-  rate: Rate
-  contribute: Contrib
-  add_time: Add birth time
-  correct_time: Correct birth time
-  action: Please correct your inputs or calculate now
-  b_hour: the hour of your birth
-  b_min: the minute of your birth
-  events: Special
-  seperator: comma
-  events_error: The calculation of special anniversaries is only possible with a birth day, which is over a month in the past.
-  flag: \U0001f1ec\U0001f1e7
 az:
   day: Gün
   month: Ay
@@ -125,11 +123,10 @@ az:
   other_date: Başqa tarix
   age: Yaş
   total: Toplam
-  upcoming: Gələn doğum günü
   calc: Hesabla
   correct_bday: Doğum gününüzə düzəliş edin.
   correct_today: Bu günkü tarixə düzəliş edin.
-  action_start: Xahiş edirik, yazın
+  instruction: Xahiş edirik, yazın
   next: Sonrakı
   error: Yalnışlıq! Uyğunsuz tarix.
   try_again: Verilənlərinizə düzəliş edərdiniz.

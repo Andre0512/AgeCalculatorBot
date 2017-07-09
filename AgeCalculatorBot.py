@@ -93,7 +93,7 @@ def get_language(user):
 # Start dialog
 def start(bot, update, chat_data):
     user = update.callback_query.from_user if update.callback_query else update.message.from_user
-    if not "lang" in chat_data:
+    if not "lang" in chat_data or not "confirmed" in chat_data:
         chat_data["lang"] = get_language(user)
     name = user.first_name if update.callback_query else user.first_name
     reply = update.callback_query.message.edit_text if update.callback_query else update.message.reply_text
@@ -212,7 +212,7 @@ def get_action(arg, chat_data):
         day = strings[chat_data["lang"]]["t_birthday"]
     else:
         day = strings[chat_data["lang"]]["t_todays_date"]
-    return "\n\n💡 " + strings[chat_data["lang"]]["action_start"] + " " + period + " " + day + ":"
+    return "\n\n💡 " + strings[chat_data["lang"]]["instruction"] + " " + period + " " + day + ":"
 
 
 # Delete chat_data for new inputs
@@ -311,14 +311,14 @@ def button(bot, update, chat_data):
         send(bot, update.callback_query, chat_data)
     elif arg_one == "add_time":
         update.callback_query.message.edit_text(
-            get_text(chat_data, time=True) + "\n\n💡 " + strings[chat_data["lang"]]["action_start"] + " " +
+            get_text(chat_data, time=True) + "\n\n💡 " + strings[chat_data["lang"]]["instruction"] + " " +
             strings[chat_data["lang"]]["b_hour"] + ":",
             reply_markup=get_number_kb(6, 4, 'bhour', limit=24, start_one=False),
             parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "bhour":
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
         update.callback_query.message.edit_text(
-            get_text(chat_data) + "\n\n💡 " + strings[chat_data["lang"]]["action_start"] + " " +
+            get_text(chat_data) + "\n\n💡 " + strings[chat_data["lang"]]["instruction"] + " " +
             strings[chat_data["lang"]]["b_min"] + ":",
             reply_markup=get_number_kb(8, 8, 'bmin', limit=59, start_one=False), parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "special_events":
@@ -368,7 +368,6 @@ def err():
 
 
 if __name__ == '__main__':
-    main()
     while True:
         try:
             main()
