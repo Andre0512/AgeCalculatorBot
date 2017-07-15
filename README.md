@@ -15,6 +15,7 @@
 ## Functions
 * Calculates time since birth and time until next birthday
 * Calculates age in years, months, days, hours, minutes and seconds
+* Updating this total values interactively for 15 seconds
 * Calculates the weekday of your birth and the weekdays for the next ten birthdays
 * Calculates special events e.g. the date when you get 1,000,000 hours old
 * Simple interface for inserting date
