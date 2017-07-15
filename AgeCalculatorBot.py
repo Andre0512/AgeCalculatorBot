@@ -223,12 +223,12 @@ def delete_date(chat_data, arg):
 
 
 # Try to answer button press, catch error for no language
-def try_button(bot, update, chat_data):
+def try_button(bot, update, chat_data, job_queue):
     if cfg['agecalculator']['debug']:
-        button(bot, update, chat_data)
+        button(bot, update, chat_data, job_queue)
     else:
         try:
-            button(bot, update, chat_data)
+            button(bot, update, chat_data, job_queue)
         except KeyError:
             chat_data.pop("new", None)
             if not "lang" in chat_data:
@@ -247,10 +247,22 @@ def log_user(user, chat_data):
     file.close()
 
 
+# Update the display of the total values for 10 seconds
+def update_total(bot, job):
+    update, chat_data, job_queue = job.context
+    if chat_data["cur"] == 'total' and chat_data['counter'] > 0:
+        text = strings[chat_data["lang"]]["total"] + ":\n" + Calculate.total_time(chat_data)
+        update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
+                                                reply_markup=get_result_keyboard(1, chat_data))
+        job_queue.run_once(update_total, 0.9, context=[update, chat_data, job_queue])
+        chat_data['counter'] = chat_data['counter'] - 1
+
+
 # Sending replys to button requests
-def button(bot, update, chat_data):
+def button(bot, update, chat_data, job_queue):
     update.callback_query.answer()
-    arg_one = update.callback_query.data.split(" ")[0] if not 'new' in chat_data  else chat_data['cur']
+    print(chat_data)
+    arg_one = update.callback_query.data.split(" ")[0] if not 'new' in chat_data else chat_data['cur']
     if arg_one == "sday" or arg_one == "gday":
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
         month = strings[chat_data["lang"]]["month_list"].split(", ")
@@ -293,6 +305,8 @@ def button(bot, update, chat_data):
                 strings[chat_data["lang"]]["try_again"] + ":",
                 reply_markup=get_calc_keyboard(chat_data), parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "total":
+        job_queue.run_once(update_total, 0.9, context=[update, chat_data, job_queue])
+        chat_data['counter'] = 10
         chat_data['cur'] = arg_one
         text = strings[chat_data["lang"]]["total"] + ":\n" + Calculate.total_time(chat_data)
         update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
@@ -308,7 +322,7 @@ def button(bot, update, chat_data):
         send(bot, update.callback_query, chat_data)
     elif arg_one == "new":
         chat_data['new'] = True
-        button(bot, update, chat_data)
+        button(bot, update, chat_data, job_queue)
         chat_data.pop("new", None)
         chat_data.pop("cur", None)
         send(bot, update.callback_query, chat_data)
@@ -350,7 +364,7 @@ def main():
 
     dp.add_handler(CommandHandler("start", start, pass_chat_data=True, ))
     dp.add_handler(MessageHandler(Filters.text, send, pass_chat_data=True))
-    dp.add_handler(CallbackQueryHandler(try_button, pass_chat_data=True))
+    dp.add_handler(CallbackQueryHandler(try_button, pass_chat_data=True, pass_job_queue=True))
 
     updater.start_polling()
     updater.idle()
