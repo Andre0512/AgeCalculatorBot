@@ -250,7 +250,7 @@ def log_user(user, chat_data):
 # Update the display of the total values for 10 seconds
 def update_total(bot, job):
     update, chat_data, job_queue = job.context
-    if chat_data["cur"] == 'total' and chat_data['counter'] > 0:
+    if "cur" in chat_data and chat_data["cur"] == 'total' and chat_data['counter'] > 0:
         text = strings[chat_data["lang"]]["total"] + ":\n" + Calculate.total_time(chat_data)
         try:
             update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
@@ -307,12 +307,12 @@ def button(bot, update, chat_data, job_queue):
                 strings[chat_data["lang"]]["try_again"] + ":",
                 reply_markup=get_calc_keyboard(chat_data), parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "total":
-        job_queue.run_once(update_total, 1, context=[update, chat_data, job_queue])
-        chat_data['counter'] = 15
         chat_data['cur'] = arg_one
+        chat_data['counter'] = 15
         text = strings[chat_data["lang"]]["total"] + ":\n" + Calculate.total_time(chat_data)
         update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
                                                 reply_markup=get_result_keyboard(1, chat_data))
+        job_queue.run_once(update_total, 1, context=[update, chat_data, job_queue])
     elif arg_one == "next_birthdays":
         chat_data['cur'] = arg_one
         text = Calculate.weekdays(chat_data)
