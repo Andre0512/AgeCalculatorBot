@@ -6,7 +6,7 @@ import logging
 import yaml
 import traceback
 import Calculate
-from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup, Bot
+from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup, Bot, error
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
 
 
@@ -252,16 +252,18 @@ def update_total(bot, job):
     update, chat_data, job_queue = job.context
     if chat_data["cur"] == 'total' and chat_data['counter'] > 0:
         text = strings[chat_data["lang"]]["total"] + ":\n" + Calculate.total_time(chat_data)
-        update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
-                                                reply_markup=get_result_keyboard(1, chat_data))
-        job_queue.run_once(update_total, 0.9, context=[update, chat_data, job_queue])
-        chat_data['counter'] = chat_data['counter'] - 1
+        try:
+            update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
+                                                    reply_markup=get_result_keyboard(1, chat_data))
+            chat_data['counter'] = chat_data['counter'] - 1
+        except error.BadRequest:
+            pass
+        job_queue.run_once(update_total, 1, context=[update, chat_data, job_queue])
 
 
 # Sending replys to button requests
 def button(bot, update, chat_data, job_queue):
     update.callback_query.answer()
-    print(chat_data)
     arg_one = update.callback_query.data.split(" ")[0] if not 'new' in chat_data else chat_data['cur']
     if arg_one == "sday" or arg_one == "gday":
         chat_data[arg_one] = update.callback_query.data.split(" ")[1]
@@ -305,8 +307,8 @@ def button(bot, update, chat_data, job_queue):
                 strings[chat_data["lang"]]["try_again"] + ":",
                 reply_markup=get_calc_keyboard(chat_data), parse_mode=ParseMode.MARKDOWN)
     elif arg_one == "total":
-        job_queue.run_once(update_total, 0.9, context=[update, chat_data, job_queue])
-        chat_data['counter'] = 10
+        job_queue.run_once(update_total, 1, context=[update, chat_data, job_queue])
+        chat_data['counter'] = 15
         chat_data['cur'] = arg_one
         text = strings[chat_data["lang"]]["total"] + ":\n" + Calculate.total_time(chat_data)
         update.callback_query.message.edit_text(get_text(chat_data) + "\n\n" + text, parse_mode=ParseMode.MARKDOWN,
