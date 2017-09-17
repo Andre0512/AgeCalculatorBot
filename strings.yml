@@ -106,50 +106,52 @@ az:
   day: Gün
   month: Ay
   year: İl
-  t_day: the day
-  t_month: the month
-  t_year: the year
-  days: günlər
-  months: aylar
-  years: illər
-  hours: saatlar
-  minutes: dəqiqələr
-  seconds: saniyələr
+  t_day: gününü
+  t_month: ayını
+  t_year: ilini
+  days: gün
+  months: ay
+  years: il
+  hours: saat
+  minutes: dəqiqə
+  seconds: saniyə
   early: Daha tez
   late: Daha sonra
   birthday: Doğum günü
-  t_birthday: of your birthday
+  t_birthday: doğum gününün
   todays_date: Bu günkü tarix
-  t_todays_date: of today's date
+  t_todays_date: bu günkü tarixin
   today: Bu gün
   other_date: Başqa tarix
   age: Yaş
   total: Toplam
   upcoming: Gələn doğum günü
   calc: Hesabla
-  correct_bday: Doğum gününüzə düzəliş edin.
-  correct_today: Bu günkü tarixə düzəliş edin.
-  instruction: Xahiş edirik, yazın
+  correct_bday: Doğum gününə düzəliş et.
+  correct_today: Bu günkü tarixə düzəliş et.
+  action_start: Xahiş edirik, yaz
   next: Sonrakı
   error: Yalnışlıq! Uyğunsuz tarix.
-  try_again: Verilənlərinizə düzəliş edərdiniz.
+  try_again: Verilənlərinə düzəliş et də.
   month_list: Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec
   days_list: Birinci gün, İkinci gün, Üçüncü gün, Dördüncü gün, Beşinci gün, Altıncı gün, Yeddinci gün
   weekdays: Həftənin günləri
   greeting: Salam
   question: Your language is English, right?
-  this_lang: Azərbaycan dili
+  ger_lang: German
+  eng_lang: English
+  aze_lang: Azərbaycan dili
   ja: Düzdür.
   nein: Yox
-  ok: Okay, your language is English! Now calculate your age
+  ok: Yaxşı, Yaxşı, sənin dilin Azərbaycan dilidir. İndi isə yaşını hesabla.
   new: Yeni
-  rate: Ulduz verin
+  rate: Ulduz ver.
   contribute: Qatqı
-  add_time: Doğum tarixi artırın.
-  correct_time: Doğum tarixinizə düzəliş edin.
-  action: Verdiklərinizə düzəliş edin vəya indi hesablayın.
-  b_hour: Doğumunuzun saatı
-  b_min: Doğumunuzun dəqiqəsi
+  add_time: Doğum tarixi artır.
+  correct_time: Doğum tarixinə düzəliş et.
+  action: Verdiklərinə düzəliş et, ya da elə indi hesabla.
+  b_hour: Doğumunun saatı
+  b_min: Doğumunun dəqiqəsi
   events: özəl
   seperator: comma
   events_error: Özəl anların hesablanması ancaq bir ayı dolmuş doğum dünü üçün ola bilər.
