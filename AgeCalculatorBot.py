@@ -106,6 +106,7 @@ def start(bot, update, chat_data):
 # Try to send keyboard and catch error for no language
 def send(bot, update, chat_data):
     try:
+        update = update.callback_query if update.callback_query else update
         keyboard = get_number_kb(8, 4, "sday", limit=31)
         delete_date(chat_data, 's')
         delete_date(chat_data, 'g')
@@ -115,9 +116,10 @@ def send(bot, update, chat_data):
                                   reply_markup=keyboard,
                                   parse_mode=ParseMode.MARKDOWN)
     except KeyError:
-        user = update.callback_query.from_user if update.callback_query else update.message.from_user
+        user = update.callback_query.chat if update.callback_query else update.message.from_user
         if not "lang" in chat_data:
             chat_data["lang"] = get_language(user)
+        update = update.callback_query if update.callback_query else update
         send(bot, update, chat_data)
 
 
@@ -233,7 +235,7 @@ def try_button(bot, update, chat_data, job_queue):
             chat_data.pop("new", None)
             if not "lang" in chat_data:
                 chat_data["lang"] = get_language(update.callback_query.from_user)
-            send(bot, update.callback_query, chat_data)
+            send(bot, update, chat_data)
 
 
 # Logging user requests for determine the usage
@@ -321,13 +323,13 @@ def button(bot, update, chat_data, job_queue):
     elif arg_one == "yes":
         chat_data["confirmed"] = "yes"
         start(bot, update, chat_data)
-        send(bot, update.callback_query, chat_data)
+        send(bot, update, chat_data)
     elif arg_one == "new":
         chat_data['new'] = True
         button(bot, update, chat_data, job_queue)
         chat_data.pop("new", None)
         chat_data.pop("cur", None)
-        send(bot, update.callback_query, chat_data)
+        send(bot, update, chat_data)
     elif arg_one == "add_time":
         update.callback_query.message.edit_text(
             get_text(chat_data, time=True) + "\n\n💡 " + strings[chat_data["lang"]]["instruction"] + " " +
@@ -349,7 +351,7 @@ def button(bot, update, chat_data, job_queue):
         chat_data["confirmed"] = "yes"
         chat_data["lang"] = arg_one
         start(bot, update, chat_data)
-        send(bot, update.callback_query, chat_data)
+        send(bot, update, chat_data)
 
 
 # Intialize Telegram bot and start polling
