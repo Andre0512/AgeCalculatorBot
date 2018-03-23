@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import logging
-import yaml
+import os
 import traceback
-import Calculate
+
+import yaml
 from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup, Bot, error
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler
+
+import Calculate
 
 
 # Custom constructor to read yaml with utf-8 encoding

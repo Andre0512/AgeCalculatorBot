@@ -25,17 +25,21 @@
 ## Installation
 
 #### Clone Repository
-```
+```bash
 git clone https://github.com/Andre0512/AgeCalculatorBot.git
 cd AgeCalculatorBot/
 ```
-
-#### Install Telegram framework and yaml support
+#### Create virtual environment (optional)
+```bash
+python3 -m venv venv
+source venv/bin/activate
 ```
-pip3 install python-telegram-bot pyyaml
+#### Install Telegram requirements
+```bash
+pip install -r requirements.txt
 ```
 #### Enter required data into `config.yml`
-```
+```bash
 cp config.yml.default config.yml
 nano config.yml
 ```
