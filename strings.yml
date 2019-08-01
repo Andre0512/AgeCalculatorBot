@@ -138,9 +138,7 @@ az:
   weekdays: Həftənin günləri
   greeting: Salam
   question: Your language is English, right?
-  ger_lang: German
-  eng_lang: English
-  aze_lang: Azərbaycan dili
+  this_lang: Azərbaycan dili
   ja: Düzdür.
   nein: Yox
   ok: Yaxşı, Yaxşı, sənin dilin Azərbaycan dilidir. İndi isə yaşını hesabla.

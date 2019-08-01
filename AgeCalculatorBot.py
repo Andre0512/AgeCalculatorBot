@@ -23,7 +23,7 @@ def log():
     if cfg['agecalculator']['debug']:
         logging.basicConfig(format=form, level=logging.DEBUG)
     else:
-        logging.basicConfig(format=form, level=logging.INFO, filename='error.log')
+        logging.basicConfig(format=form, level=logging.INFO, filename="{}/{}".format(os.path.dirname(os.path.realpath(__file__)),'error.log'))
     logger = logging.getLogger(__name__)
 
 
@@ -33,7 +33,7 @@ def get_yml(file):
     with open(os.path.join(os.path.dirname(__file__), file), 'rb') as ymlfile:
         values = yaml.load(ymlfile)
         for k, v in values.items():
-            result[k.decode('utf-8')] = dict_byte_to_str(v)
+            result[k] = dict_byte_to_str(v)
     return result
 
 
@@ -43,11 +43,10 @@ def dict_byte_to_str(v):
     if hasattr(v, 'items'):
         for key, value in v.items():
             if isinstance(value, bytes):
-                value = value.decode('utf-8')
                 value = str.replace(value, "\\n", "\n")
-            result[key.decode('utf-8')] = value
+            result[key] = value
     else:
-        result = v.decode('utf-8')
+        result = v
         result = str.replace(result, "\\n", "\n")
     return result
 
@@ -246,9 +245,9 @@ def log_user(user, chat_data):
     name = user.first_name + " " + user.last_name if user.last_name else user.first_name
     log = ("\n" + name + " " + str(user.id) + " " + language_code +
            " (" + str(chat_data['sday']) + "." + str(chat_data['smonth']) + "." + str(chat_data['syear']) + ")")
-    file = open("age_log.txt", "a")
-    file.write(log)
-    file.close()
+    f = open("{}/{}".format(os.path.dirname(os.path.realpath(__file__)),"age_log.txt"), "a")
+    f.write(log)
+    f.close()
 
 
 # Update the display of the total values for 10 seconds

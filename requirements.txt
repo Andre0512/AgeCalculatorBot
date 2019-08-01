@@ -1,2 +1,3 @@
-python-telegram-bot>=10.0.1
-PyYaml>=3.12
+python-telegram-bot
+PyYaml
+python-dateutil
