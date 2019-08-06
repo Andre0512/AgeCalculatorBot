@@ -58,9 +58,10 @@ def total_time(chat_data):
     diff = tday - bday
     days = diff.days
     seconds = diff.seconds
+    relative = relativedelta(tday, bday)
 
     result = "*" + str('{0:,}'.format(int(days / 365.25))) + "* " + strings[chat_data["lang"]]["years"] + "\n"
-    result = result + "*" + str('{0:,}'.format(int(days / 30.4375))) + "* " + strings[chat_data["lang"]][
+    result = result + "*" + str('{0:,}'.format((relative.years * 12 + relative.months))) + "* " + strings[chat_data["lang"]][
         "months"] + "\n"
     result = result + "*" + str('{0:,}'.format(int(days))) + "* " + strings[chat_data["lang"]]["days"] + "\n"
     result = result + "*" + str('{0:,}'.format(int(days * 24 + seconds / 3600))) + "* " + strings[chat_data["lang"]][
