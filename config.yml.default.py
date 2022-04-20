@@ -1,3 +1,5 @@
+import os
+
 agecalculator:
   bottoken: <BotToken>
   errorid: <User-ID>
