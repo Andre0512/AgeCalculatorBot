@@ -154,3 +154,55 @@ az:
   seperator: comma
   events_error: Özəl anların hesablanması ancaq bir ayı dolmuş doğum dünü üçün ola bilər.
   flag: \U0001f1e6\U0001f1ff
+tr:
+  day: Güny
+  month: Ay
+  year: Yıl
+  days: gün
+  months: ay
+  years: yıl
+  hours: saat
+  minutes: dakika
+  seconds: saniye
+  early: Daha önce
+  late: Daha sonra
+  weekdays: Hafta sonları
+  birthday: Doğum günü
+  todays_date: Bugünün tarihi
+  today: Bugün
+  other_date: Başka bir tarih
+  calc: Hesapla
+  upcoming: Sonraki doğum günü
+  age: Yaş
+  total: Toplam
+  events: Özel
+  next: Gelecek
+  new: Yeni
+  rate: Değerlendir
+  contribute: Geliştir
+  correct_bday: Doğum tarihini düzelt
+  correct_today: Bugünün tarihini düzelt
+  instruction: Lütfen şunu seçin: 
+  t_day: Gün
+  t_month: Ay
+  t_year: Yıl
+  t_todays_date: (bugünkü)
+  t_birthday: (doğum gününüzün)
+  b_hour: doğum saatiniz
+  b_min: doğum dakikanız
+  greeting: Merhaba
+  question: You speak English, right?
+  ok: Tamam, dilimiz Türkçe! Hadi şimdi yaşını hesaplayalım
+  this_lang: Türkçe
+  ja: Doğru
+  nein: Yanlış
+  add_time: Doğum saati ekle
+  correct_time: Doğum saatini düzelt
+  action: Girişlerini düzelt ya da hemen bu seçimleri hesapla
+  error: Hata -- Geçersiz tarih
+  try_again: Verilierini düzelt!
+  events_error: Özel yıl dönümlerinin hesabı ancak üzerinden en az bir ay geçmiş doğum günlerinin hesabı ile mümkündür.
+  month_list: Ocak, Şub, Mart, Nis, May, Haz, Tem, Ağu, Eyl, Ekim, Kas, Ara
+  days_list: Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi, Pazar
+  seperator: virgül
+  flag: \U0001f1f9\U0001f1f7
